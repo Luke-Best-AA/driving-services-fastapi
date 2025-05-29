@@ -18,12 +18,16 @@ WORKDIR /app
 # Copy your app files
 COPY . /app
 
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# Create and activate a virtual environment, then install Python dependencies
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip \
+    && /opt/venv/bin/pip install -r requirements.txt
+
+# Ensure the venv is used for all future RUN, CMD, ENTRYPOINT, etc.
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Expose the port your FastAPI app runs on
 EXPOSE 8000
 
 # Run the app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "run.py"]
