@@ -16,7 +16,7 @@ from .debug import Debug
 
 from .config import (
     ACCESS_TOKEN_EXPIRY_MINS, REFRESH_TOKEN_EXPIRY_HOURS,
-    SERVER, DATABASE, DB_USERNAME, DB_PASSWORD, TRUSTED_CONNECTION
+    SERVER, DATABASE, DB_USERNAME, DB_PASSWORD, TRUSTED_CONNECTION, ENV
 )
 from .messages import Messages
 
@@ -36,7 +36,8 @@ app = FastAPI()
 # Mount static files
 app.mount("/app/static", StaticFiles(directory="app/static"), name="static")
 
-Debug.enabled = True
+# Set Debug.enabled based on environment
+Debug.enabled = ENV != "prod"
 
 # Set up templates
 templates = Jinja2Templates(directory="app/templates")
