@@ -470,7 +470,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                         // Populate the form with policy details
                         createPolicyForm.querySelector('.ci-policy-id').value = 0;
                         createPolicyForm.querySelector('.user-id').value = policy.user_id;
-                        createPolicyForm.querySelector('.policy-number').value = policy.policy_number;
+                        createPolicyForm.querySelector('.policy-number').value = window.createPolicyNumber();
                         createPolicyForm.querySelector('.vrn').value = policy.vrn;
                         createPolicyForm.querySelector('.make').value = policy.make;
                         createPolicyForm.querySelector('.model').value = policy.model;
@@ -521,6 +521,61 @@ window.addEventListener('DOMContentLoaded', async () => {
 
             // Show the create policy details card
             createPolicyDetailsCard.style.display = 'block';
+        });
+
+        createPolicyForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const policyId = createPolicyForm.querySelector('.ci-policy-id').value || 0;
+            const userId = createPolicyForm.querySelector('.user-id').value;
+            const policyNumber = createPolicyForm.querySelector('.policy-number').value;
+            const vrn = createPolicyForm.querySelector('.vrn').value;
+            const make = createPolicyForm.querySelector('.make').value;
+            const model = createPolicyForm.querySelector('.model').value;
+            const startDate = createPolicyForm.querySelector('.start-date').value;
+            const endDate = createPolicyForm.querySelector('.end-date').value;
+            const coverage = createPolicyForm.querySelector('.coverage').value;
+
+            // Get selected optionals
+            const optionalsList = createPolicyForm.querySelector('.optionals-list');
+            const selectedOptionals = Array.from(optionalsList.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+     
+            // Build the policy object
+            const policy = {
+                ci_policy_id: Number(policyId),
+                user_id: Number(userId),
+                policy_number: policyNumber,
+                start_date: startDate,
+                end_date: endDate,
+                make: make,
+                model: model,
+                vrn: vrn,
+                coverage: coverage
+            };
+
+            // Get selected optional extra IDs
+            let optional_extras = [];
+            if (selectedOptionals.length > 0) {
+                // Fetch all optional extras and filter by selected IDs
+                const allExtras = await window.fetchAllOptionalExtras();
+                optional_extras = allExtras.filter(extra =>
+                    selectedOptionals.includes(String(extra.extra_id))
+                );
+            }
+
+            // Compose the request body
+            const body = {
+                policy,
+                optional_extras
+            };   
+
+            try {
+                await createCarInsurancePolicy(body);
+                alert('Policy created successfully!');
+                createPolicyForm.reset();
+                createPolicyDetailsCard.style.display = 'none'; // Hide the details card after submission
+            } catch (error) {
+                alert('Failed to create policy.');
+            }
         });
     }
 
@@ -1461,6 +1516,32 @@ async function deleteOptionalExtra(extraId) {
             }
         }
         console.error('Error deleting optional extra:', response.statusText);
+    }
+    return false;
+}
+
+async function createCarInsurancePolicy(policy) {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await fetch('/create_car_insurance_policy', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+        },
+        body: JSON.stringify(policy)
+    });
+    if (response.ok) {
+        return true;
+    } else if (response.status === 401) {
+        // if the token is expired refresh the token
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+            const refreshResponse = await window.refreshToken();
+            if (refreshResponse) {
+                return createCarInsurancePolicy(policy);
+            }
+        }
+        console.error('Error creating car insurance policy:', response.statusText);
     }
     return false;
 }
