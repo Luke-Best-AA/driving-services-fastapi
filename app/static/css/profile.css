@@ -1,0 +1,179 @@
+#user-section {
+    /* Remove top border so tabs look connected */
+    border: 1.5px solid #2a5d9f;
+    margin-top: -1.5px;
+    padding: 25px;
+}
+
+#pagination-section {
+    margin: 0;
+    padding: 0;
+}
+
+.pagination-buttons {
+    display: flex;
+    gap: 0; /* Remove gap between tab buttons */
+    justify-content: center;
+    /* Remove margin to connect tabs to section */
+    margin-bottom: 0 !important;
+}
+
+#user-profile-detail{
+    display:none
+}
+
+/* User Profile Card Styles */
+#user-profile, #user-inputs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem auto;
+    padding: 2rem 3rem;
+    max-width: 400px;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+    font-size: 1.2rem;
+    color: #222;
+    transition: box-shadow 0.2s;
+}
+
+#user-profile:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+}
+
+#user-profile h3 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #2a5d9f;
+    letter-spacing: 1px;
+}
+
+#user-profile p {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+    color: #444;
+}
+
+#profile-detail > div > h2 {
+    text-align: center;
+    font-size: 36.8px;
+    color: #2a5d9f;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(42,93,159,0.08);
+}
+
+#user-input-group {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* Prevent child overflow */
+    box-sizing: border-box;
+}
+
+#user-inputs input[type="text"],
+#user-inputs input[type="email"] {
+    padding: 12.8px 19.2px;
+    border: 1.5px solid #b6c6e3;
+    border-radius: 12px;
+    font-size: 17.6px;
+    color: #333;
+    background: #f4f6fa;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+    width: 100%;    
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+#user-inputs input[readonly] {
+    background: #e9eef6;
+    color: #888;
+    border: 1.5px solid #b6c6e3;
+    cursor: not-allowed;
+    margin-bottom: 20px;
+}
+
+.input-label {
+    font-size: 1rem;
+    color: #2a5d9f;
+    margin-bottom: 6px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+#update-profile-btn {
+    background: linear-gradient(90deg, #2a5d9f 0%, #4a7fd8 100%);
+    color: #fff;
+    padding: 12.8px 25.6px;
+    border: none;
+    border-radius: 12px;
+    font-size: 17.6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+#update-profile-btn:hover {
+    background: linear-gradient(90deg, #4a7fd8 0%, #2a5d9f 100%);
+    transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+    #user-profile {
+        padding: 1rem;
+        max-width: 95vw;
+        font-size: 1rem;
+    }
+    #user-profile h3 {
+        font-size: 1.3rem;
+    }
+}
+
+/* Pagination Buttons Styles */
+.pagination-buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination-buttons button {
+    background: #f4f6fa;
+    border: 1.5px solid #b6c6e3;
+    border-bottom: none;
+    color: #2a5d9f;
+    padding: 0.7rem 1.6rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    border-radius: 12px 12px 0 0;
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, border 0.18s;
+    position: relative;
+    top: 2px;
+    width: 50%;
+    transition: all 0.5s ease;
+}
+
+.pagination-buttons button.active,
+.pagination-buttons button:focus {
+    background: #fff;
+    color: #1a3e6e;
+    border-color: #2a5d9f;
+    border-bottom: 2.5px solid #fff;
+    z-index: 2;
+}
+
+.pagination-buttons button:not(.active):hover {
+    background: #eaf0fa;
+    color: #204b7a;
+}
+
+.pagination-buttons button:not(.active) {
+    border-bottom: 1.5px solid #2a5d9f;
+}

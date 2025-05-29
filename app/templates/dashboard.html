@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <section class="page-section">
+        <div>
+            <h2>
+                My User Profile
+            </h2>
+        </div>
+        <div id="user-profile">
+
+        </div>
+    </section>
+
+    <section class="page-section">
+        <div class="policies-header-row">
+            <h2>
+                My Car Insurance Policies
+            </h2>
+            <div id="add-new-policy">
+                <button class="create-btn">Add New Policy</button>
+            </div>
+        </div>
+        <div id="car-insurance-policies">
+
+        </div>
+    </section>
+
+    <section id="policy-create">
+        <div id="policy-create-details">
+            <form id="policy-create-form">
+                <input type="hidden" id="user-id" name="user_id" value="">
+                <input type="hidden" id="policy-number" name="policy_number" value="">
+                <table class="policy-input-table">
+                    <tr>
+                        <td><b>Start Date:</b></td>
+                        <td><input type="date" id="start-date" name="start_date" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>End Date:</b></td>
+                        <td><input type="date" id="end-date" name="end_date" value="" readonly></td>
+                    </tr>
+                    <tr>
+                        <td><b>VRN:</b></td>
+                        <td><input type="text" id="vrn" name="vrn" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Make:</b></td>
+                        <td><input type="text" id="make" name="make" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Model:</b></td>
+                        <td><input type="text" id="model" name="model" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Coverage:</b></td>
+                        <td><input type="text" id="coverage" name="coverage" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Optional Extras:</b></td>
+                        <td>
+                            <span id="create-optionals-list"></span>
+                        </td>
+                    </tr>
+                </table>
+                <button id="create-policy-btn" type="submit">Create Policy</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="policy-details"></section>
+
+    <section id="policy-update"></section>
+
+    <section id="policy-delete">
+        <div id="policy-delete-details">
+
+        </div>
+        <div id="delete-policy-confirmation">
+            <h3>Are you sure you want to delete this policy?</h3>
+            <div class="delete-buttons-row">
+                <button id="confirm-delete-btn">Yes</button>
+                <button id="cancel-delete-btn" onclick="window.closePopup()">No</button>
+            </div>
+        </div>
+    </section>
+
+    <span id="user-profile-detail">
+        <div>
+            <h3>Username: [username]</h3>
+            <p>Email: [email]</p>
+            <p>Role: [role]</p>
+        </div>
+    </span>
+
+    <span id="car-insurance-policy-detail">
+    <div id="policy-detail">
+        <table class="policy-table">
+            <tr>
+                <td><b>Policy Number:</b></td>
+                <td>[policy number]</td>
+            </tr>
+            <tr>
+                <td><b>Start Date:</b></td>
+                <td>[start date]</td>
+            </tr>
+            <tr>
+                <td><b>End Date:</b></td>
+                <td>[end date]</td>
+            </tr>
+            <tr>
+                <td><b>VRN:</b></td>
+                <td>[vrn]</td>
+            </tr>
+            <tr>
+                <td><b>Make:</b></td>
+                <td>[make]</td>
+            </tr>
+            <tr>
+                <td><b>Model:</b></td>
+                <td>[model]</td>
+            </tr>
+            <tr>
+                <td><b>Coverage:</b></td>
+                <td>[coverage]</td>
+            </tr>
+            <tr>
+                <td><b>Optional&nbsp;Extras:</b></td>
+                <td>[optionals]</td>
+            </tr>
+        </table>
+    </div>
+    </span>
+    <span id="car-insurance-policy-inputs">
+        <div id="policy-inputs">
+            <form id="policy-form" method="post">
+                <input type="hidden" id="policy-id" name="policy_id" value="">
+                <input type="hidden" id="user-id" name="user_id" value="">
+                <input type="hidden" id="policy-number" name="policy_number" value="">
+                <input type="hidden" id="end-date" name="end_date" value="">
+                <table class="policy-input-table">
+                    <tr>
+                        <td><b>Policy Number:</b></td>
+                        <td>[policy number]</td>
+                    </tr>
+                    <tr>
+                        <td><b>Start Date:</b></td>
+                        <td><input type="date" id="start-date" name="start_date" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>End Date:</b></td>
+                        <td id="end-date-label">[end date]</td>
+                    </tr>
+                    <tr>
+                        <td><b>VRN:</b></td>
+                        <td><input type="text" id="vrn" name="vrn" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Make:</b></td>
+                        <td><input type="text" id="make" name="make" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Model:</b></td>
+                        <td><input type="text" id="model" name="model" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Coverage:</b></td>
+                        <td><input type="text" id="coverage" name="coverage" value=""></td>
+                    </tr>
+                    <tr>
+                        <td><b>Optional Extras:</b></td>
+                        <td>
+                            <span id="optionals-list"></span>
+                        </td>
+                    </tr>
+                </table>
+                <button type="submit" id="update-policy-btn">Update Policy</button>
+            </form>
+        </div>
+    </span>
+    <span id="car-insurance-policy-list" style="display:none;">
+        <div class="policy-card">
+            <table class="policy-list-table">
+                <tr>
+                    <td><b>Policy Number:</b></td>
+                    <td>[policy number]</td>
+                </tr>
+                <tr>
+                    <td><b>Start Date:</b></td>
+                    <td>[start date]</td>
+                </tr>
+                <tr>
+                    <td><b>End Date:</b></td>
+                    <td>[end date]</td>
+                </tr>
+                <tr>
+                    <td><b>VRN:</b></td>
+                    <td>[vrn]</td>
+                </tr>
+                <tr>
+                    <td><b>Make:</b></td>
+                    <td>[make]</td>
+                </tr>
+                <tr>
+                    <td><b>Model:</b></td>
+                    <td>[model]</td>
+                </tr>
+                <tr>
+                    <td><b>Coverage:</b></td>
+                    <td>[coverage]</td>
+                </tr>
+                <tr>
+                    <td><b>Optional Extras:</b></td>
+                    <td>[optionals]</td>
+                </tr>
+            </table>
+            <span class="policy-actions btn-group">
+                <button type="button" class="view-btn view-policy" data-policy-id="[policy id]">View Policy</button>
+                <button type="button" class="update-btn update-policy" data-policy-id="[policy id]">Update Policy</button>
+                <button type="button" class="delete-btn delete-policy" data-policy-id="[policy id]">Delete Policy</button>
+            </span>
+        </div>
+    </span>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', path='js/dashboard.js') }}"></script>
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', path='css/dashboard.css') }}">
+{% endblock %}

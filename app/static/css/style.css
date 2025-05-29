@@ -1,0 +1,383 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    letter-spacing: 0.6px;
+}
+
+#admin-dashboard-link {
+    display: none;
+}
+
+#main-header {
+    background-color: #333;
+    color: #fff;
+    padding: 15px 0;
+    text-align: center;
+}
+
+#main-nav {
+    background-color: #444;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+#main-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+}
+
+#main-nav ul li {
+    display: inline-block;
+}
+
+/* Right-align the register link */
+#register-link {
+    margin-left: auto;
+    margin-right: 0;
+    /* Remove list-style for consistency */
+    list-style: none;
+}
+
+/* Make sure the register link stays at the right end */
+#main-nav ul {
+    width: 100%;
+}
+
+#main-nav ul li:last-child {
+    margin-left: auto;
+}
+
+#main-nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px;
+    transition: background 0.2s, color 0.2s, opacity 0.3s;
+    opacity: 0.7;
+}
+
+#main-nav ul li a:hover {
+    background: #555;
+    border-radius: 4px;
+}
+
+#main-nav ul li a.active {
+    background: #222;
+    color: #ffd700;
+    border-radius: 4px;
+    opacity: 1;
+}
+
+#main-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 15px auto;
+    padding: 24px 24px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    height: calc(100vh - 270px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute;
+    top: 51%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.create-btn {
+    background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.create-btn:hover{
+    background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.view-btn {
+    background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.view-btn:hover{
+    background: linear-gradient(90deg, #60a5fa 0%, #6366f1 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.update-btn {
+    background: linear-gradient(90deg, #e27917 0%, #ec8804 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.update-btn:hover{
+    background: linear-gradient(90deg, #ec8804 0%, #e27917 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.delete-btn {
+    background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.delete-btn:hover{
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.btn-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin:15px 0;
+}
+
+
+/* Large laptop */
+@media (max-width: 1400px) {
+    #main-content {
+        max-width: 1000px;
+    }
+}
+
+/* Standard laptop */
+@media (max-width: 1100px) {
+    #main-content {
+        max-width: 800px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    #main-content {
+        width:90%;
+        max-width: 900px;
+        margin: 20px 0;
+    }
+}
+
+/* On mobile, make #main-content full width and remove extra margins/padding */
+@media (max-width: 600px) {
+    #main-content {
+        width: calc(100% - 25px);
+        margin: 0;
+        margin-top: 15px;
+        padding: 15px 10px;
+        border-radius: 0;
+        box-shadow: none;
+        height: calc(100vh - 200px);
+        position: fixed;
+        top: 100px;
+        left: 0;
+        right: 0;
+        transform: none;
+    }
+
+    #popup-container {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    #popup-content {
+        width: 100%;
+        height: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: stretch;
+    }
+
+    #popup-close {
+        top: 45px !important;
+        right: 50px !important;
+    }
+}
+
+#main-footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #333;
+    color: #ddd;
+    text-align: center;
+    padding: 15px 0;
+    z-index: 100;
+}
+
+.page-section {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 20px;
+}
+
+#popup-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    z-index: 201; /* raised above overlay */
+    display: none; /* Hidden by default */
+    width: 420px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scrollbar on animation */
+    transition: opacity 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.98); /* <-- always center vertically */
+}
+
+#popup-container.popup-open {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1); /* <-- always center vertically */
+    animation: popup-slide-down 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+#popup-container.popup-close-anim {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.98); /* <-- always center vertically */
+    transition: opacity 0.3s, transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes popup-slide-down {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -60%) scale(0.98); /* start slightly higher */
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1); /* end centered */
+    }
+}
+
+/* Overlay for popup */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(80, 80, 80, 0.8);
+    z-index: 200;
+    display: none;
+}
+
+#popup-close {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    font-size: 2rem;
+    color: #ffd700;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 2;
+    transition: color 0.2s, transform 0.2s;
+    line-height: 1;
+    padding: 0;
+    overflow: hidden;
+}
+
+#popup-close:hover {
+    color: #e11d48;
+    transform: scale(1.2) rotate(90deg);
+    /* Prevent overflow on hover */
+}
+
+#popup-title {
+    margin: 0 0 18px 0;
+    font-size: 1.6rem;
+    color: #333;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Universal checkbox styling for the whole application */
+input[type="checkbox"] {
+    accent-color: #6366f1;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1.5px solid #d1d5db;
+    background: #f8fafc;
+    vertical-align: middle;
+    margin-right: 6px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 1px 2px rgba(99,102,241,0.07);
+}
+
+input[type="checkbox"]:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px #6366f133;
+}
+
+input[type="checkbox"]:hover {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px #6366f155;
+    cursor: pointer;
+}
+
+/* Disabled checkbox style (for all checkboxes in the app) */
+input[type="checkbox"]:disabled {
+    opacity: 0.85;
+    filter: grayscale(0.2) brightness(1.1);
+    accent-color: #60a5fa;
+    cursor: default;
+}
+
+/* Disabled checkbox hover state */
+input[type="checkbox"]:disabled:hover {
+    border-color: #d1d5db;
+    box-shadow: none;
+}
+

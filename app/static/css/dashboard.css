@@ -1,0 +1,215 @@
+#car-insurance-policy,
+#car-insurance-policy-detail,
+#car-insurance-policy-inputs,
+#user-profile-detail
+{
+    display: none;
+}
+
+.policy-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    line-height: 25px;
+}
+
+#car-insurance-policies {
+    margin: 15px 0;
+}
+
+#policy-detail, #policy-inputs, #policy-create-details {
+    line-height: 40px;
+}
+
+.policy-table td:first-child,
+.policy-input-table td:first-child,
+.policy-list-table td:first-child {
+    font-weight: bold;
+    color: #444;
+    width: 160px;
+    vertical-align: top; /* Add this line */
+}
+
+#policy-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 10px 0;
+}
+
+#policy-inputs label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+#policy-inputs label span {
+    min-width: 110px;
+    color: #444;
+    font-weight: bold;
+}
+
+#policy-inputs input[type="text"],
+#policy-inputs input[type="date"],
+#policy-create-details input[type="text"],
+#policy-create-details input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    background: #f8fafc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+#policy-inputs input[type="text"]:focus,
+#policy-inputs input[type="date"]:focus,
+#policy-create-details input[type="text"]:focus,
+#policy-create-details input[type="date"]:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px #6366f133;
+}
+
+#policy-inputs .optionals-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-weight: 500;
+    flex-wrap: wrap;
+}
+
+.optional-extra-checkbox {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 14px;
+    margin-bottom: 6px;
+    font-weight: 400;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+}
+
+#policy-inputs button,
+#policy-form button,
+#update-policy-btn,
+#policy-create-form button {
+    width: 100%;
+    padding: 12px 0;
+    margin-top: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.07);
+    letter-spacing: 0.5px;
+}
+
+#policy-inputs button:hover,
+#policy-form button:hover,
+#update-policy-btn:hover,
+#policy-create-form button:hover {
+    background: linear-gradient(90deg, #60a5fa 0%, #6366f1 100%);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+}
+
+#add-new-policy {
+    text-align: right;
+}
+
+.policies-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+#delete-policy-confirmation {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#delete-policy-confirmation .delete-buttons-row {
+    display: flex;
+    width: 100%;
+    gap: 0;
+}
+
+#confirm-delete-btn, #cancel-delete-btn {
+    flex: 1 1 50%;
+    border: none;
+    padding: 12px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+#confirm-delete-btn {
+    background: linear-gradient(90deg, #ef4444 0%, #f59e42 100%);
+    color: #fff;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+}
+
+#cancel-delete-btn {
+    background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 100%);
+    color: #333;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+#confirm-delete-btn:hover {
+    background: linear-gradient(90deg, #dc2626 0%, #f59e42 100%);
+}
+
+#cancel-delete-btn:hover {
+    background: linear-gradient(90deg, #d1d5db 0%, #e5e7eb 100%);
+}
+
+@media (max-width: 600px) {
+    .policies-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    #delete-policy-confirmation {
+        position: fixed;
+        bottom: 50px !important;
+        width: calc(100vw - 80px) !important;
+        margin: 0 !important;
+    }
+
+    #update-policy-btn {
+        position: fixed;
+        bottom: 50px !important;
+        width: calc(100vw - 45px) !important;
+        margin: 0 !important;
+    }
+}

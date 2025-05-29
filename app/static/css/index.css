@@ -1,0 +1,175 @@
+#main-content {
+    overflow: hidden;
+}
+
+#home-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "header login";
+    gap: 40px;
+    height: 100%;
+    width: 100%;
+}
+
+#home-header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#home-header h1 {
+    margin: 0 0 18px 0;
+    font-size: 2.2rem;
+    color: #333;
+    letter-spacing: 1px;
+}
+
+#home-header p {
+    margin: 10px 0;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+#home-header ol {
+    margin-top: 20px;
+    line-height: 35px;
+}
+
+#home-header ol li{
+    margin: 0;
+    margin-left: 20px;
+    padding: 0;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+#login-section {
+    grid-area: login;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#main-login-container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 60px;
+}
+
+#main-header-container {
+    padding: 50px 50px 0 50px;
+}
+
+/* Apply animation to all direct children of #main-content */
+#main-content > * {
+    animation: fadeInUp 2.5s cubic-bezier(.23,1.01,.32,1) both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#form-login {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 380px;
+    margin-top: 10px;
+    animation: fadeIn 0.8s 0.2s both;
+    align-items: center;
+}
+
+#form-login input[type="text"],
+#form-login input[type="password"],
+#form-login button[type="submit"] {
+    width: 240px;
+    box-sizing: border-box;
+}
+
+#form-login input[type="text"],
+#form-login input[type="password"] {
+    padding: 12px;
+    border: 1px solid #bfc7d1;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border 0.3s, box-shadow 0.3s;
+    outline: none;
+}
+
+#form-login input[type="text"]:focus,
+#form-login input[type="password"]:focus {
+    border: 1.5px solid #6366f1;
+    box-shadow: 0 0 0 2px #a5b4fc44;
+}
+
+#form-login button[type="submit"] {
+    padding: 12px;
+    background: linear-gradient(90deg, #6366f1 0%, #7b8dfb 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.8s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+}
+
+#form-login button[type="submit"]:hover {
+    background: linear-gradient(90deg, #7b8dfb 0%, #6366f1 100%);
+    transform: translateY(-2px) scale(1.01);
+}
+
+#form-login-error-msg {
+    color: #e11d48;
+    margin-top: 10px;
+    min-height: 20px;
+    font-size: 1rem;
+    text-align: center;
+    display: block;
+}
+
+/* Responsive for tablet and below: stack header and login vertically */
+@media (max-width: 900px) {
+    #home-content {
+        grid-template-areas: "header header" "login login";
+        /* Reduce vertical gap between header and login section */
+        gap: 10px;
+    }
+
+    #home-header h1 {
+        font-size: 1.8rem;
+        line-height: 1.2;
+    }
+
+    #home-header p {
+        font-size: 1rem;
+    }
+    
+    #home-header ol {
+        line-height: 25px;
+    }
+
+    #main-login-container {
+        padding: 40px 30px;
+    }
+}
+
+/* Responsive for mobile */
+@media (max-width: 500px) {
+}

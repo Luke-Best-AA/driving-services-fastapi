@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ title }}</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+        <link rel="stylesheet" href="/app/static/css/style.css">
+        <link rel="icon" type="image/x-icon" href="/app/static/favicon.png">
+        {% block styles %}{% endblock %}
+    </head>
+    <body>
+        {% set page_title = self.title() %}
+        {% include "header.html" with context %}
+        <!-- Overlay for popup -->
+        <div class="popup-overlay" id="popup-overlay"></div>
+        <div id="popup-container">
+            <div id="popup-content">
+                <span id="popup-close" class="close-btn">&times;</span>
+                <h2 id="popup-title">Pop Up</h2>
+                <div id="popup-body"></div>
+            </div>
+        </div>
+        </div>
+        <main id="main-content">
+            {% block content %}{% endblock %}
+        </main>
+        
+        {% include "footer.html" %}
+        <script src="/app/static/js/main.js"></script>            
+        {% block scripts %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,503 @@
+#main-content {
+    width: 100%;
+    margin: 20px 0;
+    max-width: 100%;
+    position: static;
+    left: auto;
+    top: auto;
+    transform: none;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 0;
+    height: calc(100vh - 200px);
+    display: none;
+    overflow: hidden;
+}
+
+#admin-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr;
+    grid-template-areas: "picker definer output";
+    height: 100%;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.admin-section {
+    padding: 10px;    
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: scroll;
+    height: 100%;
+}
+
+#action-picker {
+    grid-area: picker;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 20px;
+    height: 100%;
+}
+
+#action-definer {
+    grid-area: definer;
+}
+
+#action-output {
+    grid-area: output;
+}
+
+.admin-btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    margin: 2px 0;
+    width: 50%;
+}
+
+.admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-create-btn {
+    background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+    color: #fff;
+}
+
+.admin-create-btn:hover {
+    background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.admin-read-btn {
+    background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+    color: #2b2323;
+}
+
+.admin-read-btn:hover {
+    background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+}
+
+.admin-update-btn {
+    background: linear-gradient(90deg, #eab308 0%, #fbbf24 100%);
+    color: #2b2323;
+}
+
+.admin-update-btn:hover {
+    background: linear-gradient(90deg, #fbbf24 0%, #eab308 100%);
+}
+
+.admin-delete-btn {
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+    color: #fff;
+}
+
+.admin-delete-btn:hover {
+    background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+}
+
+.active-btn {
+    background: #fffbe6;
+    color: #d97706;
+    border: 2px solid #f59e42;
+    box-shadow: 0 0 0 3px #fde68a, 0 4px 8px rgba(0,0,0,0.08);
+    text-shadow: none;
+    z-index: 1;
+    position: relative;
+    outline: none;
+}
+
+.active-btn:hover {
+    background: #fffbe6;
+    color: #d97706;
+    border: 2px solid #f59e42;
+    box-shadow: 0 0 0 3px #fde68a, 0 4px 8px rgba(0,0,0,0.08);
+    text-shadow: none;
+    transform: none;
+}
+
+.definer-input {
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    width: auto;
+    max-width: 100%;
+}
+
+/* Output card styling */
+#create-user-details-card {
+    width: 100%;
+    max-width: 400px;
+}
+
+#read-user-details-card {
+    width: 100%;
+    max-width: 600px;
+}
+
+#update-user-details-card {
+    width: 100%;
+    max-width: 400px;
+}
+
+#delete-user-details-card,
+#delete-policy-details-card {
+    width: 90%;
+}
+
+.output-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 24px 32px;
+    margin: 0 auto 18px auto;
+    display: block;
+}
+
+.output-card header h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 18px;
+}
+
+.output-details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 10px;
+    /* Add for scrollable tables */
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* Limit the height of the table container and add vertical scroll if needed */
+#read-user-list-details,
+#read-policy-list-details {
+    max-height: 60vh;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.definer-input input[type="number"],
+.definer-input input[type="text"],
+.definer-input input[type="email"],
+.definer-input input[type="password"],
+.definer-input select {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: #fff;
+    transition: border 0.2s;
+    outline: none;
+    padding: 8px 10px;
+}
+
+.definer-input input[type="number"] {
+    margin-bottom: 6px;
+}
+
+.definer-input input[type="text"],
+.definer-input input[type="email"],
+.definer-input input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    transition: border 0.2s, background 0.2s;
+    color: #374151;
+}
+
+.definer-input select {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.definer-input input[type="number"]:focus {
+    border: 1.5px solid #3b82f6;
+    background: #f0f9ff;
+}
+
+.input-label,
+.definer-input label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 2px;
+    margin-top: 6px;
+    text-align: left;
+}
+
+.output-submit-btn {
+    width: 100%;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+.error-msg {
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.success-msg {
+    color: #22c55e;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* Keep the confirm button on the right in the copy user id section */
+.definer-confirm-btn {
+    width: auto;
+    min-width: 70px;
+    float: right;
+}
+
+.list-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-top: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.list-table thead {
+    background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+    color: #fff;
+}
+
+.list-table th, .list-table td {
+    padding: 12px 16px;
+    text-align: left;
+    min-width: 100px;
+}
+
+.list-table th {
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    border-bottom: 2px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+}
+
+.list-table tbody tr {
+    background: #fff;
+    transition: background 0.2s;
+}
+
+.list-table tbody tr:nth-child(even) {
+    background: #f3f4f6;
+}
+
+.list-table tbody tr:hover {
+    background: #e0e7ff;
+}
+
+.list-table td {
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+}
+
+.list-table tr:last-child td {
+    border-bottom: none;
+}
+
+.sortable-table th {
+    position: relative;
+    user-select: none;
+    transition: background 0.2s;
+    /* Reserve space for the sort arrow */
+    padding-right: 1.5em;
+}
+
+.sortable-table th::after {
+    /* Reserve space for the arrow even when not sorted */
+    content: "";
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    float: right;
+}
+
+.sortable-table th.sort-asc::after {
+    content: " ▲";
+    font-size: 0.9em;
+    color: #2563eb;
+    float: right;
+}
+
+.sortable-table th.sort-desc::after {
+    content: " ▼";
+    font-size: 0.9em;
+    color: #2563eb;
+    float: right;
+}
+
+.table-sort-desc {
+    font-size: 14px;
+    color: #374151;
+}
+
+.filter-btn {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.delete-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff8f8;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 4px rgba(239, 68, 68, 0.07);
+    font-size: 15px;
+}
+
+.delete-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #991b1b;
+    font-weight: 500;
+}
+
+.delete-table tr:last-child td {
+    border-bottom: none;
+}
+
+#delete-user-details,
+#delete-policy-details {
+    margin-bottom: 18px;
+}
+
+#delete-user-details p,
+#delete-policy-details p {
+    color: #991b1b;
+    font-weight: 600;
+    margin: 12px 0 18px 0;
+    font-size: 15px;
+}
+
+#delete-user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+#delete-user-submit-btn {
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+    color: #fff;
+    border-radius: 8px;
+    font-weight: bold;
+    padding: 10px 24px;
+    font-size: 15px;
+    margin-top: 8px;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.07);
+}
+
+#delete-user-submit-btn:hover {
+    background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.13);
+}
+
+#create-policy-details-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+.output-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.07);
+}
+
+.output-form label.input-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2563eb;
+    margin-bottom: 2px;
+    margin-top: 6px;
+    text-align: left;
+}
+
+.output-form input[type="text"],
+.output-form input[type="date"] {
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    background: #fff;
+    transition: border 0.2s;
+    outline: none;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+.output-form input[type="text"]:focus,
+.output-form input[type="date"]:focus {
+    border: 1.5px solid #3b82f6;
+    background: #f0f9ff;
+}
+
+.output-form .optionals-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+#read-policy-details-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+#update-policy-details-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+#delete-policy-details-card .optionals-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+#create-extra-details-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+#read-extra-details-card {
+    width: 100%;
+    max-width: 400px;
+}
+
+#update-extra-details-card {
+    width: 100%;
+    max-width: 500px;
+}
+
+#delete-extra-details-card {
+    width: 100%;
+    max-width: 400px;
+}
