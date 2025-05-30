@@ -496,6 +496,35 @@ async function populateOptionalExtras(policy, optionalsList, disabled = false) {
     }
 }
 
+async function updateUserPassword(userId, existingPassword, newPassword) {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await fetch('/update_user_password', {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ user_id: userId, existing_password: existingPassword, new_password: newPassword })
+    });
+    if (response.ok) {
+        const data = await response.json();
+        console.log('Password updated successfully:', data);
+        return data;
+    } else if (response.status === 401) {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+            const refreshResponse = await window.refreshToken();
+            if (refreshResponse) {
+                return await updateUserPassword(userId, existingPassword, newPassword);
+            }
+        }
+        console.error('Error updating password:', response.statusText);
+    } else {
+        const errorData = await response.json();
+        console.error('Error updating password:', errorData);
+    }
+}
+
 function createPolicyNumber() {
     return "CI" + Math.floor(10000 + Math.random() * 90000);
 }

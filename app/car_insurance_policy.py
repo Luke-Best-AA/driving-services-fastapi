@@ -48,8 +48,8 @@ class CarInsurancePolicy(BaseModel):
         if not isinstance(self.policy_number, str) or not self.policy_number.isalnum() or len(self.policy_number) >= 20:
             validation_errors.append("Policy number must be alphanumeric and less than 20 characters.")
 
-        if not isinstance(self.coverage, str) or not self.coverage.replace(" ", "").isalnum() or len(self.coverage) >= 20:
-            validation_errors.append("Coverage must be alphanumeric (spaces allowed) and less than 20 characters.")
+        if not isinstance(self.coverage, str) or not self.coverage.replace(" ", "").isalnum() or len(self.coverage) >= 40:
+            validation_errors.append("Coverage must be alphanumeric (spaces allowed) and less than 40 characters.")
 
         # Validate date format (YYYY-MM-DD)
         if not re.match(r"^\d{4}-\d{2}-\d{2}$", self.start_date):

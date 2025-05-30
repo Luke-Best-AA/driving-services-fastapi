@@ -58,3 +58,42 @@ def test_db_close_failure(mocker, db_connect):
     with pytest.raises(DatabaseConnectionError) as exc_info:
         db_connect.close()
     assert str(exc_info.value) == "Error closing the database connection: Close failed"
+
+def test_db_connect_sql_auth_success(mocker):
+    # Mock pyodbc.connect to simulate a successful connection
+    mocker.patch("pyodbc.connect", return_value=mocker.Mock())
+    db = DBConnect(
+        server="sql_server",
+        database="sql_db",
+        trusted_connection=False,
+        username="sql_user",
+        password="sql_pass"
+    )
+    db.connect()
+    assert db.connection is not None
+
+def test_db_connect_sql_auth_missing_credentials():
+    db = DBConnect(
+        server="sql_server",
+        database="sql_db",
+        trusted_connection=False,
+        username=None,
+        password=None
+    )
+    with pytest.raises(DatabaseConnectionError) as exc_info:
+        db.connect()
+    assert "Username and password must be provided" in str(exc_info.value)
+
+def test_db_connect_sql_auth_failure(mocker):
+    # Mock pyodbc.connect to raise an error
+    mocker.patch("pyodbc.connect", side_effect=pyodbc.Error("SQL Auth failed"))
+    db = DBConnect(
+        server="sql_server",
+        database="sql_db",
+        trusted_connection=False,
+        username="sql_user",
+        password="sql_pass"
+    )
+    with pytest.raises(DatabaseConnectionError) as exc_info:
+        db.connect()
+    assert "Error connecting to the database: SQL Auth failed" in str(exc_info.value)

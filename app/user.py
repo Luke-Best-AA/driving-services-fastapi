@@ -25,7 +25,8 @@ class User(BaseModel):
         validation_errors = []
 
         self._validate_username(validation_errors)
-        self._validate_password(validation_errors)
+        if self.password != "":
+            self._validate_password(validation_errors)
         self._validate_email(validation_errors)
         self._validate_is_admin(validation_errors)
 
@@ -41,8 +42,8 @@ class User(BaseModel):
 
     def _validate_username(self, validation_errors):
         if self.username is not None:
-            if not self.username.isalnum() or not self.username[0].isalpha() or len(self.username) < 5:
-                validation_errors.append("username must be alphanumeric, start with a letter, and be at least 5 characters long")
+            if not self.username.isalnum() or not self.username[0].isalpha() or len(self.username) < 4:
+                validation_errors.append("username must be alphanumeric, start with a letter, and be at least 4 characters long")
 
     def _validate_password(self, validation_errors):
         if self.password is not None:

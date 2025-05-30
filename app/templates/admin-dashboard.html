@@ -107,12 +107,18 @@
                     <div id="update-user-options" class="action-options">
                         <div class="admin-action-btn-group">
                             <button id="update-user-id-btn" class="admin-btn definer-btn admin-update-btn">Update User by ID</button>
+                            <button id="update-user-pwd-btn" class="admin-btn definer-btn admin-update-btn">Update User Password</button>
                         </div>
                     </div>
                     <div id="update-user-id-input" class="definer-input">
-                        <label for="user-id">User Id:</label>
+                        <label for="update-user-id">User Id:</label>
                         <input type="number" id="update-user-id" name="user_id" value="" min="1" step="1">
                         <button id="update-user-id-confirm-btn" class="admin-btn admin-update-btn definer-confirm-btn">Select</button>
+                    </div>
+                    <div id="update-user-pwd-input" class="definer-input">
+                        <label for="update-pwd-user-id">User Id:</label>
+                        <input type="number" id="update-pwd-user-id" name="user_id" value="" required>
+                        <button id="update-user-pwd-confirm-btn" class="admin-btn admin-update-btn definer-confirm-btn">Select</button>
                     </div>
                 </article>
             </div>
@@ -406,6 +412,29 @@
                     </div>
                     <div id="update-user-error-msg" class="error-msg"></div>
                     <div id="update-user-success-msg" class="success-msg"></div>
+                </article>
+            </div>
+            <div id="update-user-password-output">
+                <article id="update-user-pwd-details-card" class="output-card" style="display: none;">
+                    <header>
+                        <h2>
+                            Update User Password
+                        </h2>
+                    </header>
+                    <div id="update-user-pwd-details" class="output-details">
+                        <form id="update-user-pwd-form" class="definer-input output-form" method="post">
+                            <input type="hidden" class="user-id" name="user_id" value="">
+                            <label for="username" class="input-label">Username</label>
+                            <p class="username"></p>
+                            <label for="new-password" class="input-label">New Password</label>
+                            <input type="password" class="new-password" name="new_password" value="" required>
+                            <label for="confirm-password" class="input-label">Confirm New Password</label>
+                            <input type="password" class="confirm-password" name="confirm_password" value="" required>
+                            <button id="update-user-password-submit-btn" class="admin-btn admin-update-btn output-submit-btn" type="submit">Update Password</button>
+                        </form>
+                    </div>
+                    <div id="update-user-password-error-msg" class="error-msg"></div>
+                    <div id="update-user-password-success-msg" class="success-msg"></div>
                 </article>
             </div>
             <div id="delete-user-output">

@@ -65,7 +65,7 @@
     text-shadow: 0 2px 8px rgba(42,93,159,0.08);
 }
 
-#user-input-group {
+.input-group {
     width: 100%;
     max-width: 100%;
     display: flex;
@@ -75,7 +75,8 @@
 }
 
 #user-inputs input[type="text"],
-#user-inputs input[type="email"] {
+#user-inputs input[type="email"],
+#user-inputs input[type="password"] {
     padding: 12.8px 19.2px;
     border: 1.5px solid #b6c6e3;
     border-radius: 12px;
@@ -106,8 +107,32 @@
     margin-top: 2px;
 }
 
-#update-profile-btn {
-    background: linear-gradient(90deg, #2a5d9f 0%, #4a7fd8 100%);
+#update-profile-confirm-btn {
+    background: linear-gradient(90deg, #2a5d9f 0%, #4a7fd8 100%);    
+}
+
+#update-profile-confirm-btn:hover {
+    background: linear-gradient(90deg, #4a7fd8 0%, #2a5d9f 100%);
+}
+
+#cancel-password-btn {
+    background: linear-gradient(90deg, #f87171 0%, #fca5a5 100%);
+    margin-bottom: 10px;
+}
+
+#cancel-password-btn:hover {
+    background: linear-gradient(90deg, #fca5a5 0%, #f87171 100%);
+}
+
+#update-password-btn {
+    background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
+}
+
+#update-password-btn:hover {
+    background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
+}
+
+.update-profile-btn {
     color: #fff;
     padding: 12.8px 25.6px;
     border: none;
@@ -121,9 +146,8 @@
     max-width: 100%;
 }
 
-#update-profile-btn:hover {
-    background: linear-gradient(90deg, #4a7fd8 0%, #2a5d9f 100%);
-    transform: scale(1.05);
+.update-profile-btn:hover {
+    transform: scale(1.02);
 }
 
 @media (max-width: 600px) {
@@ -176,4 +200,23 @@
 
 .pagination-buttons button:not(.active) {
     border-bottom: 1.5px solid #2a5d9f;
+}
+
+#change-password-btn {
+    background: linear-gradient(90deg, #eab308 0%, #fbbf24 100%);
+    color: #fff;
+    padding: 5px 7px;
+    border: none;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+#change-password-btn:hover {
+    background: linear-gradient(90deg, #fbbf24 0%, #eab308 100%);
+    transform: scale(1.02);
 }
