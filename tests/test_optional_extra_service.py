@@ -76,6 +76,11 @@ async def test_delete_optional_extra_success(mocker, mock_cursor, optional_extra
         "get_optional_extra_by_id",
         return_value=[optional_extra.model_dump()]
     )
+    # Patch execute_select for related records to return empty list (no related records)
+    mocker.patch(
+        "app.services.optional_extra_service.SelectStatementExecutor.execute_select",
+        return_value=[]
+    )
     mock_delete = mocker.patch(
         "app.services.optional_extra_service.DeleteStatementExecutor.execute_delete",
         return_value=None

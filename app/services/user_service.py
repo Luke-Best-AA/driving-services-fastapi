@@ -109,6 +109,30 @@ class UserService:
         """
         executor.execute_update(sql, (updated_user.username, updated_user.email, updated_user.is_admin, updated_user.user_id))
 
+    async def update_user_password(self, user_id: int, new_password: str):
+        """
+        Updates the password of an existing user in the database.
+
+        :param user_id: The ID of the user to update.
+        :param new_password: The new password to set for the user.
+        """
+        # Check if the user exists
+        user = await self.get_user_by_id(user_id, password=True)
+
+        if not user:
+            raise ValueError(
+                APIResponse(
+                    status=HTTPStatus.NOT_FOUND,
+                    message=Messages.USER_NOT_FOUND,
+                    data=None
+                )
+            )
+
+        # Update the user's password
+        executor = UpdateStatementExecutor(self.cursor)
+        sql = "UPDATE Users SET password = ? WHERE user_id = ?"
+        executor.execute_update(sql, (new_password, user_id))
+
     async def delete_user(self, user_id: int):
         """
         Deletes a user from the database.
@@ -162,6 +186,16 @@ class UserService:
         sql = "SELECT * FROM CarInsurancePolicy WHERE user_id = ? AND ci_policy_id = ?"
         result = SelectStatementExecutor(self.cursor).execute_select(sql, (user.user_id, policy_id))
         return len(result) > 0
+    
+    def verify_password(self, existing_password: str, provided_password: str):
+        """
+        Verifies if the provided password matches the existing password.
+
+        :param existing_password: The existing password stored in the database.
+        :param provided_password: The password provided by the user for verification.
+        :return: True if the passwords match, False otherwise.
+        """
+        return existing_password == provided_password
     
     async def list_all_users(self, requesting_user):
         self.check_admin(requesting_user)

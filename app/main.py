@@ -5,8 +5,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.exceptions import RequestValidationError
 
-from starlette.requests import Request
-
 from .user import User
 from .optional_extra import OptionalExtra
 from .car_insurance_policy import CarInsurancePolicy
@@ -87,7 +85,8 @@ def exception_handler(func):
         try:
             return await func(*args, **kwargs)
         except ValueError as e:
-            if isinstance(e.args[0], APIResponse):
+            # Ensure e.args exists and is not empty
+            if hasattr(e, "args") and e.args and isinstance(e.args[0], APIResponse):
                 api_response = e.args[0]
                 raise HTTPException(
                     status_code=api_response.status,
@@ -220,6 +219,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme)):
         content={
             "access_token": access_token,
             "refresh_token": new_refresh_token,
+            "token_type": "bearer",
             "user": {
                 "user_id": user.user_id,
                 "username": user.username,
@@ -344,6 +344,53 @@ async def update_user(updated_user: User, token_data: dict = Depends(verify_toke
         content={
             "message": Messages.USER_UPDATED_SUCCESS,
             "user": updated_user.model_dump()
+        },
+        status_code=HTTPStatus.OK
+    )
+
+@app.put("/update_user_password")
+@exception_handler
+async def update_user_password(
+    user_id: int,
+    existing_password: str,
+    new_password: str,
+    token_data: dict = Depends(verify_token)
+):
+    with DBConnect(SERVER, DATABASE, TRUSTED_CONNECTION, DB_USERNAME, DB_PASSWORD) as db:
+        cursor = db.connection.cursor()
+        service = UserService(cursor)
+        requesting_user = await service.get_user_by_id(token_data["user_id"])
+        service.check_update_permissions(requesting_user, user_id)
+        validate_required_fields({"user_id": user_id, "existing_password": existing_password, "new_password": new_password})
+
+        # Check if the existing password is correct
+        user = await service.get_user_by_id(user_id, requesting_user, password=True)
+        user_new_password = User(user_id=user.user_id, username=user.username, password=new_password, email=user.email, is_admin=user.is_admin)
+        user_new_password.validate_user_values()
+        
+        if not service.verify_password(existing_password, user.password):
+            raise ValueError(
+                APIResponse(
+                    status=HTTPStatus.UNAUTHORIZED,
+                    message=Messages.USER_INVALID_CREDENTIALS,
+                    data=None
+                )
+            )
+        
+        if new_password == user.password:
+            raise ValueError(
+                APIResponse(
+                    status=HTTPStatus.BAD_REQUEST,
+                    message=Messages.NO_CHANGE,
+                    data=None
+                )
+            )
+
+        await service.update_user_password(user_id, new_password)
+    return JSONResponse(
+        content={
+            "message": Messages.USER_PASSWORD_UPDATED_SUCCESS,
+            "user_id": user_id
         },
         status_code=HTTPStatus.OK
     )

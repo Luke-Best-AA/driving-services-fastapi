@@ -245,3 +245,68 @@ def test_format_users(user):
     result = service.format_users(users)
     assert isinstance(result, list)
     assert result[0]["user_id"] == user.user_id
+
+@pytest.mark.asyncio
+async def test_update_user_password_success(mocker, mock_cursor, user):
+    # Mock get_user_by_id to return a user (user exists)
+    mocker.patch.object(
+        UserService,
+        "get_user_by_id",
+        return_value=user
+    )
+    mock_update = mocker.patch(
+        "app.services.user_service.UpdateStatementExecutor.execute_update",
+        return_value=None
+    )
+    service = UserService(mock_cursor)
+    await service.update_user_password(user.user_id, "newpassword")
+    mock_update.assert_called_once_with("UPDATE Users SET password = ? WHERE user_id = ?", ("newpassword", user.user_id))
+
+@pytest.mark.asyncio
+async def test_update_user_password_user_not_found(mocker, mock_cursor, user):
+    # Mock get_user_by_id to return None (user does not exist)
+    mocker.patch.object(
+        UserService,
+        "get_user_by_id",
+        return_value=None
+    )
+    service = UserService(mock_cursor)
+    with pytest.raises(ValueError) as exc:
+        await service.update_user_password(999, "newpassword")
+    assert Messages.USER_NOT_FOUND in str(exc.value)
+    
+def test_verify_password_match(mock_cursor):
+    service = UserService(mock_cursor)
+    existing_password = "secret123"
+    provided_password = "secret123"
+    assert service.verify_password(existing_password, provided_password) is True
+
+def test_verify_password_no_match(mock_cursor):
+    service = UserService(mock_cursor)
+    existing_password = "secret123"
+    provided_password = "wrongpass"
+    assert service.verify_password(existing_password, provided_password) is False
+
+def test_verify_password_empty_strings(mock_cursor):
+    service = UserService(mock_cursor)
+    existing_password = ""
+    provided_password = ""
+    assert service.verify_password(existing_password, provided_password) is True
+
+def test_verify_password_none_and_string(mock_cursor):
+    service = UserService(mock_cursor)
+    existing_password = None
+    provided_password = "something"
+    assert service.verify_password(existing_password, provided_password) is False
+
+def test_verify_password_string_and_none(mock_cursor):
+    service = UserService(mock_cursor)
+    existing_password = "something"
+    provided_password = None
+    assert service.verify_password(existing_password, provided_password) is False
+
+def test_verify_password_both_none(mock_cursor):
+    service = UserService(mock_cursor)
+    existing_password = None
+    provided_password = None
+    assert service.verify_password(existing_password, provided_password) is True
