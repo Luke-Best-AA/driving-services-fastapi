@@ -631,7 +631,7 @@ def test_update_user_password_valid(admin_token, mocker, valid_admin_user):
     # Mock update_user_password to do nothing
     mocker.patch("app.services.user_service.UserService.update_user_password", return_value=None)
 
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         params={
             "user_id": 1,
@@ -652,7 +652,7 @@ def test_update_user_password_invalid_existing_password(admin_token, mocker, val
     # Existing password does not match
     mocker.patch("app.services.user_service.UserService.verify_password", return_value=False)
 
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         params={"user_id": 1, "existing_password": "wrongpass", "new_password": "newpass"},
         headers={"Authorization": f"Bearer {admin_token}"}
@@ -669,7 +669,7 @@ def test_update_user_password_no_change(admin_token, mocker, valid_admin_user):
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     mocker.patch("app.services.user_service.UserService.verify_password", return_value=True)
 
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         params={"user_id": 1, "existing_password": "482c811da5d5b4bc6d497ffa98491e38", "new_password": "482c811da5d5b4bc6d497ffa98491e38"},
         headers={"Authorization": f"Bearer {admin_token}"}
@@ -683,7 +683,7 @@ def test_update_user_password_forbidden(non_admin_token, mocker, valid_non_admin
     mocker.patch("app.services.user_service.UserService.get_user_by_id", side_effect=[valid_non_admin_user, valid_non_admin_user])
     mocker.patch("app.services.user_service.UserService.check_update_permissions", side_effect=ValueError(APIResponse(status=HTTPStatus.FORBIDDEN, message=Messages.USER_NO_PERMISSION_CHANGE, data=None)))
 
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         params={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
         headers={"Authorization": f"Bearer {non_admin_token}"}
@@ -699,7 +699,7 @@ def test_update_user_password_invalid_data(admin_token, mocker, valid_admin_user
     # Patch User.validate_user_values to raise ValueError for invalid new password
     mocker.patch("app.user.User.validate_user_values", side_effect=ValueError(APIResponse(status=HTTPStatus.BAD_REQUEST, message=Messages.INVALID_REQUEST_DATA, data=None)))
 
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         params={"user_id": 1, "existing_password": "oldpass", "new_password": "bad"},
         headers={"Authorization": f"Bearer {admin_token}"}
@@ -715,7 +715,7 @@ def test_update_user_password_database_error(admin_token, mocker, valid_admin_us
     # Patch update_user_password to raise Exception
     mocker.patch("app.services.user_service.UserService.update_user_password", side_effect=Exception("DB error"))
 
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         params={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
         headers={"Authorization": f"Bearer {admin_token}"}
@@ -725,7 +725,7 @@ def test_update_user_password_database_error(admin_token, mocker, valid_admin_us
 
 def test_update_user_password_missing_params(admin_token):
     # Missing required params
-    response = client.put(
+    response = client.patch(
         "/update_user_password",
         headers={"Authorization": f"Bearer {admin_token}"}
     )

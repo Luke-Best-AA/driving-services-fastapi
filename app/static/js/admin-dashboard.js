@@ -1314,7 +1314,7 @@ async function getAllUsers() {
         if (refreshToken) {
             const refreshResponse = await window.refreshToken();
             if (refreshResponse) {
-                const data = await getUserById(userId);
+                const data = await getAllUsers();
                 return data;
             }
         }

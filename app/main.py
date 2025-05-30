@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel
 
 from .user import User
 from .optional_extra import OptionalExtra
@@ -348,27 +349,40 @@ async def update_user(updated_user: User, token_data: dict = Depends(verify_toke
         status_code=HTTPStatus.OK
     )
 
-@app.put("/update_user_password")
+class UpdateUserPasswordPayload(BaseModel):
+    user_id: int
+    existing_password: str
+    new_password: str
+
+@app.patch("/update_user_password")
 @exception_handler
 async def update_user_password(
-    user_id: int,
-    existing_password: str,
-    new_password: str,
+    payload: UpdateUserPasswordPayload,
     token_data: dict = Depends(verify_token)
 ):
     with DBConnect(SERVER, DATABASE, TRUSTED_CONNECTION, DB_USERNAME, DB_PASSWORD) as db:
         cursor = db.connection.cursor()
         service = UserService(cursor)
         requesting_user = await service.get_user_by_id(token_data["user_id"])
-        service.check_update_permissions(requesting_user, user_id)
-        validate_required_fields({"user_id": user_id, "existing_password": existing_password, "new_password": new_password})
+        service.check_update_permissions(requesting_user, payload.user_id)
+        validate_required_fields({
+            "user_id": payload.user_id,
+            "existing_password": payload.existing_password,
+            "new_password": payload.new_password
+        })
 
         # Check if the existing password is correct
-        user = await service.get_user_by_id(user_id, requesting_user, password=True)
-        user_new_password = User(user_id=user.user_id, username=user.username, password=new_password, email=user.email, is_admin=user.is_admin)
+        user = await service.get_user_by_id(payload.user_id, requesting_user, password=True)
+        user_new_password = User(
+            user_id=user.user_id,
+            username=user.username,
+            password=payload.new_password,
+            email=user.email,
+            is_admin=user.is_admin
+        )
         user_new_password.validate_user_values()
         
-        if not service.verify_password(existing_password, user.password):
+        if not service.verify_password(payload.existing_password, user.password):
             raise ValueError(
                 APIResponse(
                     status=HTTPStatus.UNAUTHORIZED,
@@ -377,7 +391,7 @@ async def update_user_password(
                 )
             )
         
-        if new_password == user.password:
+        if payload.new_password == user.password:
             raise ValueError(
                 APIResponse(
                     status=HTTPStatus.BAD_REQUEST,
@@ -386,11 +400,11 @@ async def update_user_password(
                 )
             )
 
-        await service.update_user_password(user_id, new_password)
+        await service.update_user_password(payload.user_id, payload.new_password)
     return JSONResponse(
         content={
             "message": Messages.USER_PASSWORD_UPDATED_SUCCESS,
-            "user_id": user_id
+            "user_id": payload.user_id
         },
         status_code=HTTPStatus.OK
     )

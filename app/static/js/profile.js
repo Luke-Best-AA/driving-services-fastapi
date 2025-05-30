@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const userProfile = document.getElementById('user-profile');
     const userInputs = document.getElementById('user-inputs');
+    const userInputForm = document.getElementById('user-input-form');
     const userProfileDetail = document.getElementById('user-profile-detail');
 
     if (userProfile) {
@@ -62,6 +63,52 @@ document.addEventListener('DOMContentLoaded', async function () {
             viewBtn.classList.remove('active');
             userProfile.style.display = 'none';
             userInputs.style.display = 'block';
+        });
+    }
+
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const updatePasswordForm = document.getElementById('update-password-form');
+    if (changePasswordBtn) {
+        changePasswordBtn.addEventListener('click', function () {
+            userInputForm.style.display = 'none';
+            if (updatePasswordForm) {
+                updatePasswordForm.style.display = 'block';
+            }
+        });
+    }
+
+    if (updatePasswordForm) {
+        updatePasswordForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const currentPassword = md5(document.getElementById('current-password').value);
+            const newPassword = md5(document.getElementById('new-password').value);
+            const confirmPassword = md5(document.getElementById('confirm-password').value);
+
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            try {
+                await window.updateUserPassword(user.user_id, currentPassword, newPassword);
+                alert('Password updated successfully.');
+                // Optionally, refresh the page or update the UI
+                window.location.reload();
+            } catch (err) {
+                alert('Failed to update password.');
+                console.error(err);
+            }
+        });
+    }
+
+    const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+
+    if (cancelPasswordBtn) {
+        cancelPasswordBtn.addEventListener('click', function () {
+            if (updatePasswordForm) {
+                updatePasswordForm.style.display = 'none';
+            }
+            userInputForm.style.display = 'block';
         });
     }
 });
