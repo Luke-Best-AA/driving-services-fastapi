@@ -371,7 +371,7 @@ async def update_user_password(
             "new_password": payload.new_password
         })
 
-        # Check if the existing password is correct
+        # Check if the existing password is correct or if admin is allowed to override
         user = await service.get_user_by_id(payload.user_id, requesting_user, password=True)
         user_new_password = User(
             user_id=user.user_id,
@@ -381,24 +381,34 @@ async def update_user_password(
             is_admin=user.is_admin
         )
         user_new_password.validate_user_values()
-        
-        if not service.verify_password(payload.existing_password, user.password):
-            raise ValueError(
-                APIResponse(
-                    status=HTTPStatus.UNAUTHORIZED,
-                    message=Messages.USER_INVALID_CREDENTIALS,
-                    data=None
+
+        if payload.existing_password == "":
+            # Only admin can update password without existing password
+            if not requesting_user.is_admin:
+                raise ValueError(
+                    APIResponse(
+                        status=HTTPStatus.FORBIDDEN,
+                        message=Messages.USER_NO_PERMISSION,
+                        data=None
+                    )
                 )
-            )
-        
-        if payload.new_password == user.password:
-            raise ValueError(
-                APIResponse(
-                    status=HTTPStatus.BAD_REQUEST,
-                    message=Messages.NO_CHANGE,
-                    data=None
+        else:
+            if not service.verify_password(payload.existing_password, user.password):
+                raise ValueError(
+                    APIResponse(
+                        status=HTTPStatus.UNAUTHORIZED,
+                        message=Messages.USER_INVALID_CREDENTIALS,
+                        data=None
+                    )
                 )
-            )
+            if payload.new_password == user.password:
+                raise ValueError(
+                    APIResponse(
+                        status=HTTPStatus.BAD_REQUEST,
+                        message=Messages.NO_CHANGE,
+                        data=None
+                    )
+                )
 
         await service.update_user_password(payload.user_id, payload.new_password)
     return JSONResponse(

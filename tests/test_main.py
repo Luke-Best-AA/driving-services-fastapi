@@ -633,7 +633,7 @@ def test_update_user_password_valid(admin_token, mocker, valid_admin_user):
 
     response = client.patch(
         "/update_user_password",
-        params={
+        json={
             "user_id": 1,
             "existing_password": "482c811da5d5b4bc6d497ffa98491e38",  # valid MD5
             "new_password": "5f4dcc3b5aa765d61d8327deb882cf99"      # valid MD5
@@ -654,7 +654,7 @@ def test_update_user_password_invalid_existing_password(admin_token, mocker, val
 
     response = client.patch(
         "/update_user_password",
-        params={"user_id": 1, "existing_password": "wrongpass", "new_password": "newpass"},
+        json={"user_id": 1, "existing_password": "wrongpass", "new_password": "newpass"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == HTTPStatus.UNAUTHORIZED
@@ -671,7 +671,7 @@ def test_update_user_password_no_change(admin_token, mocker, valid_admin_user):
 
     response = client.patch(
         "/update_user_password",
-        params={"user_id": 1, "existing_password": "482c811da5d5b4bc6d497ffa98491e38", "new_password": "482c811da5d5b4bc6d497ffa98491e38"},
+        json={"user_id": 1, "existing_password": "482c811da5d5b4bc6d497ffa98491e38", "new_password": "482c811da5d5b4bc6d497ffa98491e38"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -685,7 +685,7 @@ def test_update_user_password_forbidden(non_admin_token, mocker, valid_non_admin
 
     response = client.patch(
         "/update_user_password",
-        params={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
+        json={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
         headers={"Authorization": f"Bearer {non_admin_token}"}
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
@@ -701,7 +701,7 @@ def test_update_user_password_invalid_data(admin_token, mocker, valid_admin_user
 
     response = client.patch(
         "/update_user_password",
-        params={"user_id": 1, "existing_password": "oldpass", "new_password": "bad"},
+        json={"user_id": 1, "existing_password": "oldpass", "new_password": "bad"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
@@ -717,7 +717,7 @@ def test_update_user_password_database_error(admin_token, mocker, valid_admin_us
 
     response = client.patch(
         "/update_user_password",
-        params={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
+        json={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
@@ -729,8 +729,73 @@ def test_update_user_password_missing_params(admin_token):
         "/update_user_password",
         headers={"Authorization": f"Bearer {admin_token}"}
     )
+    print(response.text)
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert "user_id" in response.text or "existing_password" in response.text or "new_password" in response.text
+    assert "Field required" in response.text
+
+def test_update_user_password_admin_override(admin_token, mocker, valid_admin_user):
+    # Admin can update password without providing existing password
+    mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
+    mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
+    mocker.patch("app.services.user_service.UserService.update_user_password", return_value=None)
+    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    payload = {
+        "user_id": valid_admin_user.user_id,
+        "existing_password": "",  # Admin override
+        "new_password": "newpass123"
+    }
+    response = client.patch("/update_user_password", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()["message"] == Messages.USER_PASSWORD_UPDATED_SUCCESS
+
+
+def test_update_user_password_non_admin_empty_existing_password(non_admin_token, mocker, valid_non_admin_user):
+    # Non-admin cannot update password with empty existing_password
+    mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_non_admin_user)
+    mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
+    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    payload = {
+        "user_id": valid_non_admin_user.user_id,
+        "existing_password": "",  # Not allowed for non-admin
+        "new_password": "newpass123"
+    }
+    response = client.patch("/update_user_password", json=payload, headers={"Authorization": f"Bearer {non_admin_token}"})
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json()["detail"] == Messages.USER_NO_PERMISSION
+
+
+def test_update_user_password_existing_password_check(admin_token, mocker, valid_admin_user):
+    # If existing_password is not empty, must match user's password
+    mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
+    mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
+    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    # Patch verify_password to return False (wrong password)
+    mocker.patch("app.services.user_service.UserService.verify_password", return_value=False)
+    payload = {
+        "user_id": valid_admin_user.user_id,
+        "existing_password": "wrongpass",
+        "new_password": "newpass123"
+    }
+    response = client.patch("/update_user_password", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json()["detail"] == Messages.USER_INVALID_CREDENTIALS
+
+
+def test_update_user_password_existing_password_match(admin_token, mocker, valid_admin_user):
+    # If existing_password is correct, password update should succeed
+    mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
+    mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
+    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    mocker.patch("app.services.user_service.UserService.verify_password", return_value=True)
+    mocker.patch("app.services.user_service.UserService.update_user_password", return_value=None)
+    payload = {
+        "user_id": valid_admin_user.user_id,
+        "existing_password": "correctpass",
+        "new_password": "newpass123"
+    }
+    response = client.patch("/update_user_password", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
+    assert response.status_code == HTTPStatus.OK
+    assert response.json()["message"] == Messages.USER_PASSWORD_UPDATED_SUCCESS    
 
 def test_delete_user_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user

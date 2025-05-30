@@ -22,7 +22,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     // Get all action buttons and output cards
     const actionButtons = document.querySelectorAll('.action-btn');  
-    const definerButtons = document.querySelectorAll('.definer-btn');
     const definerCards = document.querySelectorAll('.definer-card');
     const outputCards = document.querySelectorAll('.output-card');      
 
@@ -304,9 +303,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         const updateUserId = document.getElementById('update-user-id');
         const updateUserIdBtn = document.getElementById('update-user-id-btn');
         const updateUserByIdInput = document.getElementById('update-user-id-input');
+        const updateUserPwdInput = document.getElementById('update-user-pwd-input');        
 
         updateUserBtn.addEventListener('click', () => {
             updateUserByIdInput.style.display = 'none';
+            updateUserPwdInput.style.display = 'none';
         });
 
         const updateUserByIdConfirm = document.getElementById('update-user-id-confirm-btn');
@@ -315,6 +316,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             hideAllOutputCards();
             removeActiveClassFromButtons('definer');
             updateUserIdBtn.classList.add('active-btn');
+            updateUserPwdInput.style.display = 'none';
             updateUserByIdInput.style.display = 'block';
         });
             
@@ -340,6 +342,36 @@ window.addEventListener('DOMContentLoaded', async () => {
             }                    
         });
 
+        const updatePwdUserId = document.getElementById('update-pwd-user-id');
+        const updateUserPwdBtn = document.getElementById('update-user-pwd-btn');
+
+        updateUserPwdBtn.addEventListener('click', () => {
+            hideAllOutputCards();
+            removeActiveClassFromButtons('definer');
+            updateUserPwdBtn.classList.add('active-btn');
+            updateUserByIdInput.style.display = 'none';
+            updateUserPwdInput.style.display = 'block';
+        });
+
+        const updateUserPwdConfirm = document.getElementById('update-user-pwd-confirm-btn');
+        updateUserPwdConfirm.addEventListener('click', () => {
+            const user_id = updatePwdUserId.value;
+
+            if (user_id) {
+                window.getUserById(user_id).then(user => {
+                    if (user) {
+                        // Populate the form with user details
+                        const updateUserPwdDetailsCard = document.getElementById('update-user-pwd-details-card');
+                        updateUserPwdDetailsCard.querySelector('.user-id').value = user.user_id;
+                        updateUserPwdDetailsCard.querySelector('.username').textContent = user.username;
+                        updateUserPwdDetailsCard.style.display = 'block';
+                    } else {
+                        alert('User not found.');
+                    }
+                });
+            }
+        });
+
         const updateUserForm = document.getElementById('update-user-form');
 
         updateUserForm.addEventListener('submit', async function (e) {
@@ -363,6 +395,31 @@ window.addEventListener('DOMContentLoaded', async () => {
                 updateUserByIdConfirm.click(); // Reset the form by re-fetching user details
             } catch (error) {
                 alert('Failed to update user.');
+            }
+        });
+
+        const updateUserPwdForm = document.getElementById('update-user-pwd-form');
+        updateUserPwdForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const userId = updateUserPwdForm.querySelector('.user-id').value;
+            const new_password = updateUserPwdForm.querySelector('.new-password').value;
+            const confirm_password = updateUserPwdForm.querySelector('.confirm-password').value;
+
+            if (userId && new_password && confirm_password) {
+                if (new_password !== confirm_password) {
+                    alert('New password and confirm password do not match.');
+                    return;
+                }
+
+                try {
+                    await window.updateUserPassword(userId, "", md5(new_password));
+                    alert('Password updated successfully!');
+                    updateUserPwdInput.style.display = 'none'; // Hide the input after successful update
+                } catch (error) {
+                    alert('Failed to update password.');
+                }
+            } else {
+                alert('Please enter a user ID and passwords.');
             }
         });
     }
