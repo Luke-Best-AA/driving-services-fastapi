@@ -1,5 +1,6 @@
 import pyodbc
 import logging
+from .debug import Debug
 
 # Custom exception for database connection errors
 class DatabaseConnectionError(Exception):
@@ -32,7 +33,7 @@ class DBConnect:
                     f"DATABASE={self.database};"
                     f"Trusted_Connection=yes;"
                 )
-                logging.info("Connection to the database was successful using Windows Authentication.")
+                Debug.log(f"Connected to {self.database} on {self.server} using Windows Authentication.")
             else:
                 if not self.username or not self.password:
                     raise DatabaseConnectionError("Username and password must be provided for SQL Server Authentication.")
@@ -43,18 +44,18 @@ class DBConnect:
                     f"UID={self.username};"
                     f"PWD={self.password};"
                 )
-                logging.info("Connection to the database was successful using SQL Server Authentication.")
+                Debug.log(f"Connected to {self.database} on {self.server} using SQL Server Authentication.")
         except pyodbc.Error as e:
             error_message = f"Error connecting to the database: {e}"
-            logging.error(error_message)
+            Debug.log(error_message)
             raise DatabaseConnectionError(error_message)
 
     def close(self):
         try:
             if self.connection:
                 self.connection.close()
-                logging.info("Connection closed.")
+                Debug.log(f"Connection to {self.database} on {self.server} closed.")
         except pyodbc.Error as e:
             error_message = f"Error closing the database connection: {e}"
-            logging.error(error_message)
+            Debug.log(error_message)
             raise DatabaseConnectionError(error_message)
