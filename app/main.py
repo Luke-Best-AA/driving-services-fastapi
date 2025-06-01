@@ -187,7 +187,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme)):
         access_token_data = {
             "user_id": user_id,
             "username": username,
-            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=15)  # Access token expires in 15 minutes
+            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRY_MINS)  # Access token expires in 15 minutes
         }
         access_token = jwt.encode(access_token_data, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -195,7 +195,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme)):
         refresh_token_data = {
             "user_id": user_id,
             "username": username,
-            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)  # Refresh token expires in 7 days
+            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=REFRESH_TOKEN_EXPIRY_HOURS)  # Refresh token expires in 7 days
         }
         new_refresh_token = jwt.encode(refresh_token_data, SECRET_KEY, algorithm=ALGORITHM)
 
