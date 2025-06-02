@@ -14,8 +14,22 @@ window.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/';
     }
     else {
-        if (window.innerWidth <= 1200) {
-            alert("Welcome to the admin dashboard. You must use a desktop to access the features of the admin dashboard effectively.");
+        // Use sessionStorage to prevent popup from showing too frequently (30 min)
+        const popupKey = 'adminPopupShownAt';
+        const now = Date.now();
+        const lastShown = sessionStorage.getItem(popupKey);
+        const THIRTY_MIN = 30 * 60 * 1000;
+        if (window.innerWidth <= 1200 && (!lastShown || now - Number(lastShown) > THIRTY_MIN)) {
+            sessionStorage.setItem(popupKey, now.toString());
+            const popupTitle = document.getElementById('popup-title');
+            const popupBody = document.getElementById('popup-body');
+            // Use the template HTML for the popup body
+            const warningTemplate = document.getElementById('admin-dashboard-mobile-warning-template');
+            if (popupTitle) popupTitle.textContent = 'Admin Dashboard Notice';
+            if (popupBody && warningTemplate) {
+                popupBody.innerHTML = warningTemplate.innerHTML;
+            }
+            if (typeof window.openPopup === 'function') window.openPopup();
         }
         mainContent.style.display = 'block';
     }
