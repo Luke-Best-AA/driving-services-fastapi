@@ -96,72 +96,65 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
 
             setTimeout(() => {
-                const popupForm = document.getElementById('policy-form');
-                if (popupForm) {
-                    popupForm.onsubmit = null;
-
-                    setTimeout(() => {
-                        const updateForm = document.getElementById('policy-form');
-                        const errorDiv = document.getElementById('update-policy-error');
-                        if (updateForm) {
-                            updateForm.addEventListener('submit', async function (e) {
-                                e.preventDefault();
-                                if (errorDiv) {
-                                    errorDiv.style.display = 'none';
-                                    errorDiv.textContent = '';
-                                }
-                                // Collect form data
-                                const formData = new FormData(updateForm);
-                                // Build updated_policy object
-                                const updated_policy = {
-                                    ci_policy_id: parseInt(formData.get('policy_id'), 10),
-                                    user_id: parseInt(formData.get('user_id'), 10),
-                                    policy_number: formData.get('policy_number'),
-                                    start_date: formData.get('start_date'),
-                                    end_date: formData.get('end_date'),
-                                    make: formData.get('make'),
-                                    model: formData.get('model'),
-                                    vrn: formData.get('vrn'),
-                                    coverage: formData.get('coverage')
-                                };
-
-                                // Get selected optional extra IDs
-                                const optionalsList = updateForm.querySelector("#optionals-list");
-                                const optionals = Array.from(optionalsList.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
-
-                                let optional_extras = [];
-                                if (optionals.length > 0) {
-                                    // Fetch all optional extras and filter by selected IDs
-                                    const allExtras = await window.fetchAllOptionalExtras();
-                                    optional_extras = allExtras.filter(extra =>
-                                        optionals.includes(String(extra.extra_id))
-                                    );
-                                }
-
-                                // Compose the request body
-                                const data = {
-                                    updated_policy,
-                                    optional_extras
-                                };
-
-                                // Call API
-                                const result = await window.updateCarInsurancePolicy(data);
-                                // alert json result
-                                console.log(result);
-                                if (result.success) {
-                                    window.closePopup();
-                                    location.reload();
-                                } else {
-                                    if (errorDiv) {
-                                        errorDiv.textContent = window.extractApiErrorMessage(result.data || result.message);
-                                        errorDiv.style.display = 'block';
-                                    }
-                                }
-                            });
+                const updateForm = document.getElementById('policy-form');
+                const errorDiv = document.getElementById('update-policy-error');
+                if (updateForm) {
+                    updateForm.addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        if (errorDiv) {
+                            errorDiv.style.display = 'none';
+                            errorDiv.textContent = '';
                         }
-                    }, 0);
+                        // Collect form data
+                        const formData = new FormData(updateForm);
+                        // Build updated_policy object
+                        const updated_policy = {
+                            ci_policy_id: parseInt(formData.get('policy_id'), 10),
+                            user_id: parseInt(formData.get('user_id'), 10),
+                            policy_number: formData.get('policy_number'),
+                            start_date: formData.get('start_date'),
+                            end_date: formData.get('end_date'),
+                            make: formData.get('make'),
+                            model: formData.get('model'),
+                            vrn: formData.get('vrn'),
+                            coverage: formData.get('coverage')
+                        };
+
+                        // Get selected optional extra IDs
+                        const optionalsList = updateForm.querySelector("#optionals-list");
+                        const optionals = Array.from(optionalsList.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+
+                        let optional_extras = [];
+                        if (optionals.length > 0) {
+                            // Fetch all optional extras and filter by selected IDs
+                            const allExtras = await window.fetchAllOptionalExtras();
+                            optional_extras = allExtras.filter(extra =>
+                                optionals.includes(String(extra.extra_id))
+                            );
+                        }
+
+                        // Compose the request body
+                        const data = {
+                            updated_policy,
+                            optional_extras
+                        };
+
+                        // Call API
+                        const result = await window.updateCarInsurancePolicy(data);
+                        // alert json result
+                        console.log(result);
+                        if (result.success) {
+                            window.closePopup();
+                            location.reload();
+                        } else {
+                            if (errorDiv) {
+                                errorDiv.textContent = window.extractApiErrorMessage(result.data || result.message);
+                                errorDiv.style.display = 'block';
+                            }
+                        }
+                    });
                 }
-            });         
+            }, 0);     
         });
     });
 
@@ -497,18 +490,15 @@ async function setPopupInputValues(policy) {
             const startVal = startDateInput.value;
             const endDateInput = popup.querySelector('#end-date');
             if (startVal && endDateLabel) {
+                // Use main.js date functions for formatting
                 const start = new Date(startVal);
-                const end = new Date(start);
-                end.setFullYear(end.getFullYear() + 1);
-                end.setDate(end.getDate() - 1);
-                const yyyy = end.getFullYear();
-                const mm = String(end.getMonth() + 1).padStart(2, '0');
-                const dd = String(end.getDate()).padStart(2, '0');
-                const endDateStr = `${dd}/${mm}/${yyyy}`;
-                endDateLabel.textContent = endDateStr;
-            }
-            if (endDateInput) {
-                endDateInput.value = endDateLabel.textContent;
+                const end = window.createEndDate(start);
+                // Set label in dd/mm/yyyy
+                endDateLabel.textContent = window.formatDate(window.dateToDatabaseFormat(end));
+                // Set input value in yyyy-mm-dd
+                if (endDateInput) {
+                    endDateInput.value = window.dateToDatabaseFormat(end);
+                }
             }
         });
     }
