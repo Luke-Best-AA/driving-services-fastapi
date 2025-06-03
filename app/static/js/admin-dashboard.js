@@ -67,9 +67,17 @@ window.addEventListener('DOMContentLoaded', async () => {
         hideAllOutputCards();
     }
 
+    // Helper to hide all error and success messages
+    function hideAllMessages() {
+        document.querySelectorAll('.error-message, .success-message').forEach(el => {
+            el.textContent = '';
+        });
+    }
+
     // Shared logic for all action buttons
     actionButtons.forEach(btn => {
         btn.addEventListener('click', function () {
+            hideAllMessages();
             // If already active, do nothing
             if (btn.classList.contains('active-btn')) return;
             removeActiveClassFromButtons('all');
@@ -83,6 +91,22 @@ window.addEventListener('DOMContentLoaded', async () => {
                 definerCard.style.display = 'block';
             }
         }, { capture: true }); // Use capture so this runs before individual listeners
+    });
+
+    // Example for definer buttons (if you have .definer-btn class)
+    const definerButtons = document.querySelectorAll('.definer-btn');
+    definerButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            hideAllMessages();
+        });
+    });
+
+    // For all definer confirm buttons (assuming class .definer-confirm-btn)
+    const definerConfirmButtons = document.querySelectorAll('.definer-confirm-btn');
+    definerConfirmButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            hideAllMessages();
+        });
     });
 
     // Set User Buttons
