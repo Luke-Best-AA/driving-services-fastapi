@@ -445,9 +445,10 @@ window.addEventListener('DOMContentLoaded', async () => {
                     document.getElementById('update-user-error-msg').textContent = response.message || 'Failed to update user.';
                     document.getElementById('update-user-success-msg').textContent = '';
                 } else {
-                    document.getElementById('update-user-success-msg').textContent = 'User updated successfully!';
+                    document.getElementById('update-user-success-msg').textContent = '';
                     document.getElementById('update-user-error-msg').textContent = '';
                     updateUserByIdConfirm.click(); // Reset the form by re-fetching user details
+                    alert('User updated successfully!');
                 }
             } catch (error) {
                 document.getElementById('update-user-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to update user.';
@@ -971,9 +972,10 @@ window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await window.updateCarInsurancePolicy(body);
                 if (response && response.success) {
-                    document.getElementById('update-policy-success-msg').textContent = 'Policy updated successfully!';
+                    document.getElementById('update-policy-success-msg').textContent = '';
                     document.getElementById('update-policy-error-msg').textContent = '';
                     updatePolicyByIdConfirm.click(); // Reset the form by re-fetching policy details
+                    alert('Policy updated successfully!');
                 } else {
                     document.getElementById('update-policy-error-msg').textContent = (response && response.message) ? response.message : 'Failed to update policy.';
                     document.getElementById('update-policy-success-msg').textContent = '';
@@ -1305,10 +1307,10 @@ window.addEventListener('DOMContentLoaded', async () => {
             try {
                 const response = await updateOptionalExtra(updated_extra);
                 if (response && response.success) {
-                    document.getElementById('update-extra-success-msg').textContent = 'Optional Extra updated successfully!';
+                    document.getElementById('update-extra-success-msg').textContent = '';
                     document.getElementById('update-extra-error-msg').textContent = '';
-                    updateExtraForm.reset();
-                    updateExtraDetailsCard.style.display = 'none'; // Hide the details card after submission
+                    updateExtraByIdConfirm.click();
+                    alert('Optional Extra updated successfully!');
                 } else {
                     document.getElementById('update-extra-error-msg').textContent = (response && response.message) ? response.message : 'Failed to update optional extra.';
                     document.getElementById('update-extra-success-msg').textContent = '';
@@ -1390,6 +1392,42 @@ window.addEventListener('DOMContentLoaded', async () => {
             }
         });
     }
+
+    // For admin-dashboard.js: ensure end date is readonly, label is dd/mm/yyyy, input value is yyyy-mm-dd, and updates on start date change
+    function setupAdminPolicyEndDateSync(formSelector, startDateSelector, endDateSelector, endDateLabelSelector) {
+        const form = document.querySelector(formSelector);
+        if (!form) return;
+        const startDateInput = form.querySelector(startDateSelector);
+        const endDateInput = form.querySelector(endDateSelector);
+        let endDateLabel = null;
+        if (endDateLabelSelector) {
+            endDateLabel = form.querySelector(endDateLabelSelector);
+        }
+        if (startDateInput && endDateInput) {
+            startDateInput.addEventListener('change', function() {
+                const startVal = startDateInput.value;
+                if (startVal) {
+                    const start = new Date(startVal);
+                    const end = window.createEndDate(start);
+                    // Set input value in yyyy-mm-dd
+                    endDateInput.value = window.dateToDatabaseFormat(end);
+                    // Set label in dd/mm/yyyy if label exists
+                    if (endDateLabel) {
+                        endDateLabel.textContent = window.formatDate(window.dateToDatabaseFormat(end));
+                    } else {
+                        // If no label, set input display value (for read-only)
+                        endDateInput.value = window.dateToDatabaseFormat(end);
+                    }
+                }
+            });
+            // Trigger change on load to set initial value
+            startDateInput.dispatchEvent(new Event('change'));
+        }
+    }
+
+    // Example usage for create and update policy forms in admin-dashboard
+    setupAdminPolicyEndDateSync('#create-policy-form', '.start-date', '.end-date');
+    setupAdminPolicyEndDateSync('#update-policy-form', '.start-date', '.end-date');
 });
 
 // Reusable table sorting function
