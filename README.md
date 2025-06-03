@@ -243,6 +243,7 @@ GO
 
 Run all tests with:
 ```powershell
+$env:PYTHONPATH = "$PWD"
 pytest
 ```
 
