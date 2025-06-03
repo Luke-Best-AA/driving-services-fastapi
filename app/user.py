@@ -24,17 +24,31 @@ class User(BaseModel):
         Debug.log("Validating user values")
         validation_errors = []
 
-        self._validate_username(validation_errors)
-        if self.password != "":
+        # Track which field caused the first error
+        error_field = None
+
+        if not error_field:
+            self._validate_username(validation_errors)
+            if validation_errors:
+                error_field = "username"
+        if not error_field and self.password != "":
             self._validate_password(validation_errors)
-        self._validate_email(validation_errors)
-        self._validate_is_admin(validation_errors)
+            if validation_errors:
+                error_field = "password"
+        if not error_field:
+            self._validate_email(validation_errors)
+            if validation_errors:
+                error_field = "email"
+        if not error_field:
+            self._validate_is_admin(validation_errors)
+            if validation_errors:
+                error_field = "is_admin"
 
         if validation_errors:
             raise ValueError(
                 APIResponse(
                     status=HTTPStatus.BAD_REQUEST,
-                    message=Messages.INVALID_FIELD_VALUE.format(", ".join(validation_errors), "user"),
+                    message=Messages.INVALID_FIELD_VALUE.format(error_field, validation_errors[0]),
                     data=None
                 )
             )           
@@ -42,25 +56,29 @@ class User(BaseModel):
 
     def _validate_username(self, validation_errors):
         if self.username is not None:
-            if not self.username.isalnum() or not self.username[0].isalpha() or len(self.username) < 4:
-                validation_errors.append("username must be alphanumeric, start with a letter, and be at least 4 characters long")
+            if len(self.username) > 20:
+                validation_errors.append("must not be longer than 20 characters")
+            elif not self.username.isalnum() or not self.username[0].isalpha() or len(self.username) < 4:
+                validation_errors.append("must be alphanumeric, start with a letter, and be at least 4 characters long")
 
     def _validate_password(self, validation_errors):
         if self.password is not None:
             if self.password == "":
                 return
             if not re.fullmatch(r"[a-fA-F0-9]{32}", self.password):
-                validation_errors.append("password must be a 32-character hexadecimal string")
+                validation_errors.append("must be a 32-character hexadecimal string")
 
     def _validate_email(self, validation_errors):
         if self.email is not None:
-            if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", self.email):
-                validation_errors.append("email must be a valid email address")
+            if len(self.email) > 32:
+                validation_errors.append("must not be longer than 32 characters")
+            elif not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", self.email):
+                validation_errors.append("must be in format: name@example.com")
 
     def _validate_is_admin(self, validation_errors):
         if self.is_admin is not None:
             Debug.log("Validating is_admin value")
             if not isinstance(self.is_admin, (bool, int)) or self.is_admin not in [True, False, 1, 0]:
-                validation_errors.append("is_admin must be a boolean value (True/False or 1/0)")
+                validation_errors.append("must be a boolean value (True/False or 1/0)")
             else:
                 self.is_admin = bool(self.is_admin)

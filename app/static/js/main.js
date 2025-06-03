@@ -302,7 +302,6 @@ async function fetchAllOptionalExtras() {
     return null;
 }
 
-// Add this function to main.js
 async function getCarInsuranceById(policyId) {
     const accessToken = localStorage.getItem('access_token');
     const response = await fetch(`/read_car_insurance_policy?mode=by_id&policy_id=${policyId}`, {
@@ -331,137 +330,95 @@ async function getCarInsuranceById(policyId) {
     return null;
 }
 
-async function createCarInsurancePolicy(data) {
+// DRY helper for API calls with token refresh and error handling
+async function handleApiResponse({ url, method = 'GET', headers = {}, body = null, retry = true }) {
     const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/create_car_insurance_policy', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    console.log('Creating car insurance policy:', data);
-    console.log('Response:', response);
+    headers['Authorization'] = `Bearer ${accessToken}`;
+    if (body && !headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json';
+    }
+    let response;
+    try {
+        response = await fetch(url, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : undefined
+        });
+    } catch (err) {
+        return { success: false, status: 0, message: 'Network error', error: err };
+    }
     if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        return data;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
+        return { success: true, data };
+    } else if (response.status === 401 && retry) {
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
             const refreshResponse = await window.refreshToken();
             if (refreshResponse) {
-                const data = await createCarInsurancePolicy(data);
-                return data;
+                // Retry once after refresh
+                return await handleApiResponse({ url, method, headers, body, retry: false });
             }
         }
-        console.error('Error creating car insurance policy:', response.statusText);
+        return { success: false, status: 401, message: 'Unauthorized' };
+    } else if ([400, 422].includes(response.status)) {
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            errorData = null;
+        }
+        return {
+            success: false,
+            status: response.status,
+            message: window.extractApiErrorMessage(errorData),
+            error: errorData
+        };
+    } else if (response.status === 404) {
+        return { success: false, status: 404, message: 'Not found' };
+    } else if (response.status === 409) {
+        return { success: false, status: 409, message: 'Already Exists' };
     }
-    return null;
+    return { success: false, status: response.status, message: 'Unknown error' };
+}
+
+// Refactored API functions using handleApiResponse
+async function createCarInsurancePolicy(data) {
+    return await handleApiResponse({
+        url: '/create_car_insurance_policy',
+        method: 'POST',
+        body: data
+    });
 }
 
 async function updateCarInsurancePolicy(updateData) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/update_car_insurance_policy', {
+    return await handleApiResponse({
+        url: '/update_car_insurance_policy',
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
+        body: updateData
     });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else if (response.status === 401) {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return await updateCarInsurancePolicy(policyId, updateData);
-            }
-        }
-        console.error('Error updating car insurance policy:', response.statusText);
-    }
-    return null;
 }
 
 async function deleteCarInsurancePolicy(policyId) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch(`/delete_car_insurance_policy?policy_id=${policyId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
+    return await handleApiResponse({
+        url: `/delete_car_insurance_policy?policy_id=${policyId}`,
+        method: 'DELETE'
     });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else if (response.status === 401) {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return await deleteCarInsurancePolicy(policyId);
-            }
-        }
-        console.error('Error deleting car insurance policy:', response.statusText);
-    }
-    return null;
 }
 
 async function updateUser(updateData) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/update_user', {
+    return await handleApiResponse({
+        url: '/update_user',
         method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updateData)
+        body: updateData
     });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else if (response.status === 401) {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return await updateUser(userId, updateData);
-            }
-        }
-        console.error('Error updating user:', response.statusText);
-    }
-    return null;
 }
 
 async function createUser(data) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/create_user', {
+    return await handleApiResponse({
+        url: '/create_user',
         method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+        body: data
     });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else if (response.status === 401) {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return await createUser(data);
-            }
-        }
-        console.error('Error creating user:', response.statusText);
-    }
-    return null;
 }
 
 // Populate optional extras in the policy form
@@ -553,6 +510,26 @@ function dateToDatabaseFormat(date) {
     return year + "-" + month + "-" + day;
 }
 
+// Utility function to handle API errors and extract messages
+function extractApiErrorMessage(error) {
+    if (!error) return 'Unknown error.';
+    if (typeof error === 'string') return error;
+    if (error.message) return error.message;
+    if (error.detail) return error.detail;
+    if (error.response && error.response.data && error.response.data.message) return error.response.data.message;
+    if (error.status === 422 && error.body) {
+        // Pydantic validation error
+        try {
+            const body = typeof error.body === 'string' ? JSON.parse(error.body) : error.body;
+            if (body && body.detail && Array.isArray(body.detail)) {
+                return body.detail.map(e => e.msg).join('; ');
+            }
+        } catch (e) {}
+        return 'Validation error (422).';
+    }
+    return 'An error occurred.';
+}
+
 // Export to window for global access to ensure availability
 window.refreshToken = refreshToken;
 window.getUserById = getUserById;
@@ -570,3 +547,5 @@ window.createPolicyNumber = createPolicyNumber;
 window.createStartDate = createStartDate;
 window.createEndDate = createEndDate;
 window.dateToDatabaseFormat = dateToDatabaseFormat;
+window.extractApiErrorMessage = extractApiErrorMessage;
+window.handleApiResponse = handleApiResponse;

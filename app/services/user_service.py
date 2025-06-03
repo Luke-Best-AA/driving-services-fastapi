@@ -91,7 +91,13 @@ class UserService:
             )
 
         # Check if there are changes
-        if existing_user == updated_user:
+        # Create copies of both users with password set to None for comparison
+        temp_existing = User(**existing_user.model_dump())
+        temp_updated = User(**updated_user.model_dump())
+        temp_existing.password = None
+        temp_updated.password = None
+
+        if temp_existing == temp_updated:
             raise ValueError(
                 APIResponse(
                     status=HTTPStatus.BAD_REQUEST,
