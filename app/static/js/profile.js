@@ -123,7 +123,7 @@ document.getElementById('user-input-form')?.addEventListener('submit', async fun
     // Get is_admin from the current user info
     const user = await window.getUserById(userId);
     if (!user) {
-        alert('User not found or unauthorized.');
+        showProfileError('User not found or unauthorized.');
         return;
     }
 
@@ -136,12 +136,37 @@ document.getElementById('user-input-form')?.addEventListener('submit', async fun
     };
 
     try {
-        await window.updateUser(data);
-        alert('Profile updated successfully.');
-        // Optionally, refresh the page or update the UI
-        window.location.reload();
+        const result = await window.updateUser(data);
+        if (result && result.success) {
+            showProfileSuccess('Profile updated successfully.');
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        } else {
+            showProfileError(window.extractApiErrorMessage(result && result.data ? result.data : result && result.message));
+        }
     } catch (err) {
-        alert('Failed to update profile.');
+        showProfileError(window.extractApiErrorMessage(err));
         console.error(err);
     }
 });
+
+// Helper functions to show error/success messages
+function showProfileError(msg) {
+    let errorDiv = document.getElementById('profile-error-msg');
+    if (errorDiv) {
+        errorDiv.textContent = msg;
+        errorDiv.style.display = 'block';
+    }
+    let successDiv = document.getElementById('profile-success-msg');
+    if (successDiv) successDiv.style.display = 'none';
+}
+function showProfileSuccess(msg) {
+    let successDiv = document.getElementById('profile-success-msg');
+    if (successDiv) {
+        successDiv.textContent = msg;
+        successDiv.style.display = 'block';
+    }
+    let errorDiv = document.getElementById('profile-error-msg');
+    if (errorDiv) errorDiv.style.display = 'none';
+}
