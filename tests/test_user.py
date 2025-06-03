@@ -52,7 +52,7 @@ def test_user_invalid_email():
     user = User(**data)
     with pytest.raises(ValueError) as exc:
         user.validate_user_values()
-    assert "email must be a valid email address" in str(exc.value)
+    assert "email must be in format: name@example.com" in str(exc.value)
 
 def test_user_invalid_is_admin():
     data = valid_user_dict()

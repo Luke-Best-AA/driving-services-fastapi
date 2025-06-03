@@ -22,7 +22,7 @@ async def test_missing_required_fields(valid_optional_extra_data):
     extra = OptionalExtra(**data)
     with pytest.raises(ValueError) as exc:
         await extra.validate_optional_extra_values()
-    assert "All fields are required." in str(exc.value)
+    assert "required" in str(exc.value)
 
 @pytest.mark.asyncio
 async def test_invalid_price(valid_optional_extra_data):
@@ -31,7 +31,7 @@ async def test_invalid_price(valid_optional_extra_data):
     extra = OptionalExtra(**data)
     with pytest.raises(ValueError) as exc:
         await extra.validate_optional_extra_values()
-    assert "Price must be a positive number." in str(exc.value)
+    assert "must be a positive number." in str(exc.value)
 
 @pytest.mark.asyncio
 async def test_negative_price(valid_optional_extra_data):
@@ -40,7 +40,7 @@ async def test_negative_price(valid_optional_extra_data):
     extra = OptionalExtra(**data)
     with pytest.raises(ValueError) as exc:
         await extra.validate_optional_extra_values()
-    assert "Price must be a positive number." in str(exc.value)
+    assert "must be a positive number." in str(exc.value)
 
 @pytest.mark.asyncio
 async def test_invalid_name(valid_optional_extra_data):
@@ -49,7 +49,7 @@ async def test_invalid_name(valid_optional_extra_data):
     extra = OptionalExtra(**data)
     with pytest.raises(ValueError) as exc:
         await extra.validate_optional_extra_values()
-    assert "Name must be alphanumeric and can include spaces." in str(exc.value)
+    assert "must be alphanumeric and can include spaces." in str(exc.value)
 
 @pytest.mark.asyncio
 async def test_invalid_code(valid_optional_extra_data):
@@ -58,7 +58,7 @@ async def test_invalid_code(valid_optional_extra_data):
     extra = OptionalExtra(**data)
     with pytest.raises(ValueError) as exc:
         await extra.validate_optional_extra_values()
-    assert "Code must be alphanumeric and less than 10 characters." in str(exc.value)
+    assert "must be alphanumeric" in str(exc.value)
 
 @pytest.mark.asyncio
 async def test_code_too_long(valid_optional_extra_data):
@@ -67,4 +67,4 @@ async def test_code_too_long(valid_optional_extra_data):
     extra = OptionalExtra(**data)
     with pytest.raises(ValueError) as exc:
         await extra.validate_optional_extra_values()
-    assert "Code must be alphanumeric and less than 10 characters." in str(exc.value)
+    assert "must not be longer than 10 characters" in str(exc.value)

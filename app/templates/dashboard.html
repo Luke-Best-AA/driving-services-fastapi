@@ -36,27 +36,27 @@
                 <table class="policy-input-table">
                     <tr>
                         <td><b>Start Date:</b></td>
-                        <td><input type="date" id="start-date" name="start_date" value=""></td>
+                        <td><input type="date" id="start-date" name="start_date" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>End Date:</b></td>
-                        <td><input type="date" id="end-date" name="end_date" value="" readonly></td>
+                        <td><input type="date" id="end-date" name="end_date" value="" readonly required></td>
                     </tr>
                     <tr>
                         <td><b>VRN:</b></td>
-                        <td><input type="text" id="vrn" name="vrn" value=""></td>
+                        <td><input type="text" id="vrn" name="vrn" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Make:</b></td>
-                        <td><input type="text" id="make" name="make" value=""></td>
+                        <td><input type="text" id="make" name="make" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Model:</b></td>
-                        <td><input type="text" id="model" name="model" value=""></td>
+                        <td><input type="text" id="model" name="model" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Coverage:</b></td>
-                        <td><input type="text" id="coverage" name="coverage" value=""></td>
+                        <td><input type="text" id="coverage" name="coverage" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Optional Extras:</b></td>
@@ -66,6 +66,7 @@
                     </tr>
                 </table>
                 <button id="create-policy-btn" type="submit">Create Policy</button>
+                <div id="create-policy-error" class="error-message" style="display:none;color:red;"></div>
             </form>
         </div>
     </section>
@@ -147,7 +148,7 @@
                     </tr>
                     <tr>
                         <td><b>Start Date:</b></td>
-                        <td><input type="date" id="start-date" name="start_date" value=""></td>
+                        <td><input type="date" id="start-date" name="start_date" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>End Date:</b></td>
@@ -155,19 +156,19 @@
                     </tr>
                     <tr>
                         <td><b>VRN:</b></td>
-                        <td><input type="text" id="vrn" name="vrn" value=""></td>
+                        <td><input type="text" id="vrn" name="vrn" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Make:</b></td>
-                        <td><input type="text" id="make" name="make" value=""></td>
+                        <td><input type="text" id="make" name="make" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Model:</b></td>
-                        <td><input type="text" id="model" name="model" value=""></td>
+                        <td><input type="text" id="model" name="model" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Coverage:</b></td>
-                        <td><input type="text" id="coverage" name="coverage" value=""></td>
+                        <td><input type="text" id="coverage" name="coverage" value="" required></td>
                     </tr>
                     <tr>
                         <td><b>Optional Extras:</b></td>
@@ -177,6 +178,7 @@
                     </tr>
                 </table>
                 <button type="submit" id="update-policy-btn">Update Policy</button>
+                <div id="update-policy-error" class="error-message" style="display:none;color:red;"></div>
             </form>
         </div>
     </span>

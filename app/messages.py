@@ -2,7 +2,7 @@ class Messages:
     # General messages
     NO_CHANGE = "No changes detected"
     INVALID_FIELD = "Invalid field: {}"
-    INVALID_FIELD_VALUE = "Invalid {} for field: {}"
+    INVALID_FIELD_VALUE = "Invalid: {} {}"
     INVALID_TYPE = "Invalid type for field"
     FIELD_REQUIRED = "Field '{}' is required"
     DUPLICATION_ERROR = "Duplicate entry"

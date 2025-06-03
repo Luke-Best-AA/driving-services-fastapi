@@ -153,6 +153,7 @@
 #delete-user-details-card,
 #delete-policy-details-card {
     width: 90%;
+    max-width: 500px;
 }
 
 .output-card {

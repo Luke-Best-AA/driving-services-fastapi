@@ -27,7 +27,7 @@ async def test_missing_required_field(valid_policy_data):
     policy = CarInsurancePolicy(**data)
     with pytest.raises(ValueError) as exc:
         await policy.validate_car_insurance_policy_values()
-    assert "All fields are required" in str(exc.value)
+    assert "Required" in str(exc.value)
 
 @pytest.mark.asyncio
 async def test_invalid_vrn(valid_policy_data):

@@ -126,12 +126,12 @@ window.addEventListener('DOMContentLoaded', async () => {
                         createUserDetailsCard.querySelector('.role').value = user.is_admin ? 'admin' : 'user';
                         createUserDetailsCard.style.display = 'block';
                     } else {
-                        alert('User not found.');
+                        alert('User not found. Please enter a valid user ID to copy.');
                     }
                 });
             }
             else {
-                alert('Please enter a user ID.');
+                alert('Please enter a user ID to copy.');
             }
         });
 
@@ -172,11 +172,18 @@ window.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
-                await window.createUser(userData);
-                alert('User created successfully!');
-                createUserForm.reset();
+                const response = await window.createUser(userData);
+                if (response && response.success) {
+                    document.getElementById('create-user-success-msg').textContent = 'User created successfully!';
+                    document.getElementById('create-user-error-msg').textContent = '';
+                    createUserForm.reset();
+                } else {
+                    document.getElementById('create-user-error-msg').textContent = (response && response.message) ? response.message : 'Failed to create user.';
+                    document.getElementById('create-user-success-msg').textContent = '';
+                }
             } catch (error) {
-                alert('Failed to create user.');
+                document.getElementById('create-user-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to create user.';
+                document.getElementById('create-user-success-msg').textContent = '';
             }
         });
     }
@@ -220,10 +227,11 @@ window.addEventListener('DOMContentLoaded', async () => {
                         readUserDetailsCard.querySelector('.email').value = user.email;
                         readUserDetailsCard.querySelector('.role').value = user.is_admin ? 'admin' : 'user';
                         readUserDetailsCard.style.display = 'block';
+                        document.getElementById('read-user-error-msg').textContent = '';
                     } else {
-                        alert('User not found.');
+                        alert('User not found. Please enter a valid user ID to read.');
                     }
-                });
+                })
             }
             else {
                 alert('Please enter a user ID.');
@@ -251,6 +259,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                             readUserTableBody.appendChild(row);
                         }
                     });
+                    document.getElementById('read-user-list-error-msg').textContent = '';
                     // Make the table sortable
                     const userListTable = document.getElementById('user-list-table');
                     if (userListTable && userListTable.classList.contains('sortable-table')) {
@@ -260,9 +269,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 } else {
                     alert('No users found.');
                 }
-            }).catch(error => {
-                console.error('Error fetching users:', error);
-            });
+            })
             readUserListCard.style.display = 'block';
         });
 
@@ -294,6 +301,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                                 readUserTableBody.appendChild(row);
                             }
                         });
+                        document.getElementById('read-user-list-error-msg').textContent = '';
                         // Make the table sortable
                         const userListTable = document.getElementById('user-list-table');
                         if (userListTable && userListTable.classList.contains('sortable-table')) {
@@ -305,9 +313,10 @@ window.addEventListener('DOMContentLoaded', async () => {
                         readUserListCard.style.display = 'none';
                         alert('No users found with the specified filter.');
                     }
-                }).catch(error => {
-                    console.error('Error fetching filtered users:', error);
-                });
+                })
+            }
+            else {
+                alert('Please enter both field and value to filter users.');
             }
         });
     }
@@ -347,7 +356,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                         updateUserDetailsCard.querySelector('.role').value = user.is_admin ? 'admin' : 'user';
                         updateUserDetailsCard.style.display = 'block';
                     } else {
-                        alert('User not found.');
+                        alert('User not found. Please enter a valid user ID to update.');
                     }
                 });
             }
@@ -380,9 +389,12 @@ window.addEventListener('DOMContentLoaded', async () => {
                         updateUserPwdDetailsCard.querySelector('.username').textContent = user.username;
                         updateUserPwdDetailsCard.style.display = 'block';
                     } else {
-                        alert('User not found.');
+                        alert('User not found. Please enter a valid user ID to update password.');
                     }
                 });
+            }
+            else {
+                alert('Please enter a user ID.');
             }
         });
 
@@ -404,11 +416,18 @@ window.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
-                await window.updateUser(userData);
-                alert('User updated successfully!');
-                updateUserByIdConfirm.click(); // Reset the form by re-fetching user details
+                const response = await window.updateUser(userData);
+                if (!response.success) {
+                    document.getElementById('update-user-error-msg').textContent = response.message || 'Failed to update user.';
+                    document.getElementById('update-user-success-msg').textContent = '';
+                } else {
+                    document.getElementById('update-user-success-msg').textContent = 'User updated successfully!';
+                    document.getElementById('update-user-error-msg').textContent = '';
+                    updateUserByIdConfirm.click(); // Reset the form by re-fetching user details
+                }
             } catch (error) {
-                alert('Failed to update user.');
+                document.getElementById('update-user-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to update user.';
+                document.getElementById('update-user-success-msg').textContent = '';
             }
         });
 
@@ -421,19 +440,23 @@ window.addEventListener('DOMContentLoaded', async () => {
 
             if (userId && new_password && confirm_password) {
                 if (new_password !== confirm_password) {
-                    alert('New password and confirm password do not match.');
+                    document.getElementById('update-user-password-error-msg').textContent = 'New password and confirm password do not match.';
+                    document.getElementById('update-user-password-success-msg').textContent = '';
                     return;
                 }
 
                 try {
                     await window.updateUserPassword(userId, "", md5(new_password));
-                    alert('Password updated successfully!');
+                    document.getElementById('update-user-password-success-msg').textContent = 'Password updated successfully!';
+                    document.getElementById('update-user-password-error-msg').textContent = '';
                     updateUserPwdInput.style.display = 'none'; // Hide the input after successful update
                 } catch (error) {
-                    alert('Failed to update password.');
+                    document.getElementById('update-user-password-error-msg').textContent = error.message || 'Failed to update password.';
+                    document.getElementById('update-user-password-success-msg').textContent = '';
                 }
             } else {
-                alert('Please enter a user ID and passwords.');
+                document.getElementById('update-user-password-error-msg').textContent = 'Please enter a user ID and passwords.';
+                document.getElementById('update-user-password-success-msg').textContent = '';
             }
         });
     }
@@ -471,7 +494,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                         deleteUserDetailsCard.querySelector('.role').textContent = user.is_admin ? 'Admin' : 'User';
                         deleteUserDetailsCard.style.display = 'block';
                     } else {
-                        alert('User not found.');
+                        alert('User not found. Please enter a valid user ID to delete.');
                     }
                 });
             }
@@ -487,19 +510,24 @@ window.addEventListener('DOMContentLoaded', async () => {
             const userId = deleteUserForm.querySelector('.user-id').value;
             if (userId) {
                 try {
-                    const success = await deleteUser(userId);
-                    if (success) {
+                    const response = await deleteUser(userId);
+                    if (response && response.success) {
+                        document.getElementById('delete-user-success-msg').textContent = 'User deleted successfully!';
+                        document.getElementById('delete-user-error-msg').textContent = '';
+                        deleteUserId.value = '';
+                        deleteUserIdBtn.click();
                         alert('User deleted successfully!');
-                        deleteUserId.value = ''; // Clear the input field
-                        deleteUserIdBtn.click(); // Reset the form by re-fetching user details
                     } else {
-                        alert('Failed to delete user.');
+                        document.getElementById('delete-user-error-msg').textContent = (response && response.message) ? response.message : 'Failed to delete user.';
+                        document.getElementById('delete-user-success-msg').textContent = '';
                     }
                 } catch (error) {
-                    alert('Failed to delete user.');
+                    document.getElementById('delete-user-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to delete user.';
+                    document.getElementById('delete-user-success-msg').textContent = '';
                 }
             } else {
-                alert('Please enter a user ID.');
+                document.getElementById('delete-user-error-msg').textContent = 'Please enter a user ID.';
+                document.getElementById('delete-user-success-msg').textContent = '';
             }
         });          
     }
@@ -555,12 +583,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
                         createPolicyDetailsCard.style.display = 'block';
                     } else {
-                        alert('Policy not found.');
+                        alert('Policy not found. Please enter a valid policy ID to copy.');
                     }
                 });
             }
             else {
-                alert('Please enter a policy ID.');
+                alert('Please enter a policy ID to copy.');
             }
         });
 
@@ -640,12 +668,19 @@ window.addEventListener('DOMContentLoaded', async () => {
             };   
 
             try {
-                await createCarInsurancePolicy(body);
-                alert('Policy created successfully!');
-                createPolicyForm.reset();
-                createPolicyDetailsCard.style.display = 'none'; // Hide the details card after submission
+                const response = await window.createCarInsurancePolicy(body);
+                if (response && response.success) {
+                    document.getElementById('create-policy-success-msg').textContent = 'Policy created successfully!';
+                    document.getElementById('create-policy-error-msg').textContent = '';
+                    createPolicyForm.reset();
+                    createPolicyDetailsCard.style.display = 'none'; // Hide the details card after submission
+                } else {
+                    document.getElementById('create-policy-error-msg').textContent = (response && response.message) ? response.message : 'Failed to create policy.';
+                    document.getElementById('create-policy-success-msg').textContent = '';
+                }
             } catch (error) {
-                alert('Failed to create policy.');
+                document.getElementById('create-policy-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to create policy.';
+                document.getElementById('create-policy-success-msg').textContent = '';
             }
         });
     }
@@ -748,7 +783,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                     alert('No policies found.');
                 }
             }).catch(error => {
-                console.error('Error fetching policies:', error);
+                document.getElementById('read-policy-list-error-msg').textContent = error.message || 'Error fetching policies.';
             });
         });
 
@@ -797,14 +832,14 @@ window.addEventListener('DOMContentLoaded', async () => {
                     } else {
                         policyTableBody.innerHTML = '';
                         readPolicyListCard.style.display = 'none';
-                        alert('No policies found with the specified filter.');
+                        document.getElementById('read-policy-list-error-msg').textContent = 'No policies found with the specified filter.';
                     }
                 }).catch(error => {
-                    console.error('Error fetching filtered policies:', error);
+                    document.getElementById('read-policy-list-error-msg').textContent = error.message || 'Error fetching filtered policies.';
                 });
             }
             else {
-                alert('Please enter a field and value to filter by.');
+                alert('Please enter a field and value to filter policies.');
             }
         });
     }
@@ -910,12 +945,19 @@ window.addEventListener('DOMContentLoaded', async () => {
             };                    
 
             try {
-                await window.updateCarInsurancePolicy(body);
-                updatePolicyByIdConfirm.click(); // Reset the form by re-fetching policy details
+                const response = await window.updateCarInsurancePolicy(body);
+                if (response && response.success) {
+                    document.getElementById('update-policy-success-msg').textContent = 'Policy updated successfully!';
+                    document.getElementById('update-policy-error-msg').textContent = '';
+                    updatePolicyByIdConfirm.click(); // Reset the form by re-fetching policy details
+                } else {
+                    document.getElementById('update-policy-error-msg').textContent = (response && response.message) ? response.message : 'Failed to update policy.';
+                    document.getElementById('update-policy-success-msg').textContent = '';
+                }
             } catch (error) {
-                alert('Failed to update policy.');
+                document.getElementById('update-policy-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to update policy.';
+                document.getElementById('update-policy-success-msg').textContent = '';
             }
-            alert('Policy updated successfully!');                    
         });
     }
 
@@ -980,24 +1022,27 @@ window.addEventListener('DOMContentLoaded', async () => {
             const policyId = deletePolicyForm.querySelector('.ci-policy-id').value;
             if (policyId) {
                 try {
-                    const success = await window.deleteCarInsurancePolicy(policyId);
-                    if (success) {
+                    const response = await window.deleteCarInsurancePolicy(policyId);
+                    if (response && response.success) {
+                        deletePolicyId.value = '';
+                        deletePolicyIdBtn.click();
                         alert('Policy deleted successfully!');
-                        deletePolicyId.value = ''; // Clear the input field
-                        deletePolicyIdBtn.click(); // Reset the form by re-fetching policy details
                     } else {
-                        alert('Failed to delete policy.');
+                        document.getElementById('delete-policy-error-msg').textContent = (response && response.message) ? response.message : 'Failed to delete policy.';
+                        document.getElementById('delete-policy-success-msg').textContent = '';
                     }
                 } catch (error) {
-                    alert('Failed to delete policy.');
+                    document.getElementById('delete-policy-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to delete policy.';
+                    document.getElementById('delete-policy-success-msg').textContent = '';
                 }
             } else {
-                alert('Please enter a policy ID.');
+                document.getElementById('delete-policy-error-msg').textContent = 'Please enter a policy ID.';
+                document.getElementById('delete-policy-success-msg').textContent = '';
             }
         });
     }
 
-    // Set Opetional Extras Buttons
+    // Set Optional Extras Buttons
     const createExtraBtn = document.getElementById('create-extra-btn');
     const readExtraBtn = document.getElementById('read-extra-btn');
     const updateExtraBtn = document.getElementById('update-extra-btn');
@@ -1030,7 +1075,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const extraId = createExtraId.value;
                 getOptionalExtraById(extraId).then(response => {
                     if (response) {
-                        const extra = response.optional_extras[0];
+                        const extra = response.data.optional_extras[0];
                         // Populate the form with extra details
                         createExtraForm.querySelector('.extra-id').value = 0;
                         createExtraForm.querySelector('.name').value = extra.name;
@@ -1040,12 +1085,12 @@ window.addEventListener('DOMContentLoaded', async () => {
                         // Show the details card
                         createExtraDetailsCard.style.display = 'block';
                     } else {
-                        alert('Optional Extra not found.');
+                        alert('Optional Extra not found. Please enter a valid extra ID to copy.');
                     }
                 });
             }
             else {
-                alert('Please enter an optional extra ID.');
+                alert('Please enter an optional extra ID to copy.');
             }
         });
 
@@ -1079,11 +1124,17 @@ window.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
-                await createOptionalExtra(new_extra);
-                alert('Optional Extra created successfully!');
-                createExtraNewBtn.click(); // Reset the form by re-fetching extra details
+                const response = await createOptionalExtra(new_extra);
+                if (response && response.success) {
+                    document.getElementById('create-extra-success-msg').textContent = 'Optional Extra created successfully!';
+                    document.getElementById('create-extra-error-msg').textContent = '';
+                } else {
+                    document.getElementById('create-extra-error-msg').textContent = (response && response.message) ? response.message : 'Failed to create optional extra.';
+                    document.getElementById('create-extra-success-msg').textContent = '';
+                }
             } catch (error) {
-                alert('Failed to create optional extra.');
+                document.getElementById('create-extra-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to create optional extra.';
+                document.getElementById('create-extra-success-msg').textContent = '';
             }
         });
     }
@@ -1097,7 +1148,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         const readExtraListAllTemplate = document.getElementById('read-extra-list-all-output-template');
         const extraTableBody = document.getElementById('extra-list-body');
         const readExtraByIdInput = document.getElementById('read-extra-id-input');
-        const readExtraByFilterInput = document.getElementById('read-extra-filter-input');
 
         readExtraBtn.addEventListener('click', () => {
             readExtraByIdInput.style.display = 'none';
@@ -1114,7 +1164,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 if (extraId) {
                     getOptionalExtraById(extraId).then(response => {
                         if (response) {
-                            const extra = response.optional_extras[0];
+                            const extra = response.data.optional_extras[0];
                             // Populate the form with extra details
                             readExtraDetailsCard.querySelector('.extra-id').value = extra.extra_id;
                             readExtraDetailsCard.querySelector('.name').value = extra.name;
@@ -1191,7 +1241,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (extraId) {
                 getOptionalExtraById(extraId).then(response => {
                     if (response) {
-                        const extra = response.optional_extras[0];
+                        const extra = response.data.optional_extras[0];
                         // Populate the form with extra details
                         const updateExtraDetailsCard = document.getElementById('update-extra-details-card');
                         updateExtraDetailsCard.querySelector('.extra-id').value = extra.extra_id;
@@ -1229,11 +1279,19 @@ window.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
-                await updateOptionalExtra(updated_extra);
-                updateExtraByIdConfirm.click(); // Reset the form by re-fetching extra details
-                alert('Optional Extra updated successfully!');
+                const response = await updateOptionalExtra(updated_extra);
+                if (response && response.success) {
+                    document.getElementById('update-extra-success-msg').textContent = 'Optional Extra updated successfully!';
+                    document.getElementById('update-extra-error-msg').textContent = '';
+                    updateExtraForm.reset();
+                    updateExtraDetailsCard.style.display = 'none'; // Hide the details card after submission
+                } else {
+                    document.getElementById('update-extra-error-msg').textContent = (response && response.message) ? response.message : 'Failed to update optional extra.';
+                    document.getElementById('update-extra-success-msg').textContent = '';
+                }
             } catch (error) {
-                alert('Failed to update optional extra.');
+                document.getElementById('update-extra-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to update optional extra.';
+                document.getElementById('update-extra-success-msg').textContent = '';
             }
         });
     }
@@ -1256,15 +1314,15 @@ window.addEventListener('DOMContentLoaded', async () => {
 
         const deleteExtraByIdConfirm = document.getElementById('delete-extra-id-confirm-btn');
         const deleteExtraForm = document.getElementById('delete-extra-form');
+        const deleteExtraDetailsCard = document.getElementById('delete-extra-details-card');        
 
         deleteExtraByIdConfirm.addEventListener('click', () => {
             const extraId = deleteExtraId.value;
             if (extraId) {
                 getOptionalExtraById(extraId).then(response => {
                     if (response) {
-                        const extra = response.optional_extras[0];
+                        const extra = response.data.optional_extras[0];
                         // Populate the form with extra details
-                        const deleteExtraDetailsCard = document.getElementById('delete-extra-details-card');
                         deleteExtraForm.querySelector('.extra-id').value = extra.extra_id;
                         deleteExtraDetailsCard.querySelector('.extra-id').textContent = extra.extra_id;
                         deleteExtraDetailsCard.querySelector('.name').textContent = extra.name;
@@ -1288,21 +1346,23 @@ window.addEventListener('DOMContentLoaded', async () => {
             const extraId = deleteExtraForm.querySelector('.extra-id').value;
             if (extraId) {
                 try {
-                    const success = await deleteOptionalExtra(extraId);
-                    if (success) {
+                    const response = await deleteOptionalExtra(extraId);
+                    if (response && response.success) {
+                        deleteExtraForm.reset();
+                        deleteExtraDetailsCard.style.display = 'none'; // Hide the details card after deletion
                         alert('Optional Extra deleted successfully!');
-                        deleteExtraId.value = ''; // Clear the input field
-                        deleteExtraIdBtn.click(); // Reset the form by re-fetching extra details
-                    }
-                    else {
-                        alert('Failed to delete optional extra.');
+                    } else {
+                        document.getElementById('delete-extra-error-msg').textContent = (response && response.message) ? response.message : 'Failed to delete optional extra.';
+                        document.getElementById('delete-extra-success-msg').textContent = '';
                     }
                 } catch (error) {
-                    alert('Failed to delete optional extra.');
+                    document.getElementById('delete-extra-error-msg').textContent = window.extractApiErrorMessage(error) || 'Failed to delete optional extra.';
+                    document.getElementById('delete-extra-success-msg').textContent = '';
                 }
             }
             else {
-                alert('Please enter an optional extra ID.');
+                document.getElementById('delete-extra-error-msg').textContent = 'Please enter an optional extra ID.';
+                document.getElementById('delete-extra-success-msg').textContent = '';
             }
         });
     }
@@ -1366,253 +1426,71 @@ function makeTableSortable(table) {
     }
 }
 
-async function getAllUsers() {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/read_user?mode=list_all', {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        //extract the user data
-        const users = data.users;
-        return users;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                const data = await getAllUsers();
-                return data;
-            }
-        }
+async function adminApiRequest({ url, method = 'GET', headers = {}, body = null }) {
+    return await window.handleApiResponse({ url, method, headers, body });
+}
 
-        console.error('Error fetching user:', response.statusText);
+async function getAllUsers() {
+    const response = await adminApiRequest({ url: '/read_user?mode=list_all' });
+    if (response && response.success && response.data && Array.isArray(response.data.users)) {
+        return response.data.users;
     }
-    return null;
+    return [];
 }
 
 async function getUserWithFilter(field, value) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch(`/read_user?mode=filter&field=${field}&value=${value}`, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        return data.users;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return getUserWithFilter(field, value);
-            }
-        }
-        console.error('Error fetching user:', response.statusText);
+    const response = await adminApiRequest({ url: `/read_user?mode=filter&field=${field}&value=${value}` });
+    if (response && response.success && response.data && Array.isArray(response.data.users)) {
+        return response.data.users;
     }
-    return null;
-}
-
-async function deleteUser(userId) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch(`/delete_user?user_id=${userId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if (response.ok) {
-        return true;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return deleteUser(userId);
-            }
-        }
-        console.error('Error deleting user:', response.statusText);
-    }
-    return false;
 }
 
 async function getAllCarInsurancePolicies() {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/read_car_insurance_policy?mode=list_all', {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        return data.policies;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return getAllCarInsurancePolicies();
-            }
-        }
-        console.error('Error fetching policies:', response.statusText);
+    const response = await adminApiRequest({ url: '/read_car_insurance_policy?mode=list_all' });
+    if (response && response.success && response.data && Array.isArray(response.data.policies)) {
+        return response.data.policies;
     }
-    return [];
 }
 
 async function getCarInsuranceWithFilter(field, value) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch(`/read_car_insurance_policy?mode=filter&field=${field}&value=${value}`, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        return data.policies;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return getCarInsuranceWithFilter(field, value);
-            }
-        }
-        console.error('Error fetching policies:', response.statusText);
+    const response = await adminApiRequest({ url: `/read_car_insurance_policy?mode=filter&field=${field}&value=${value}` });
+    if (response && response.success && response.data && Array.isArray(response.data.policies)) {
+        return response.data.policies;
     }
-    return [];
 }
 
 async function createOptionalExtra(extra) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/create_optional_extra', {
+    return await adminApiRequest({
+        url: '/create_optional_extra',
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(extra)
+        headers: { 'Content-Type': 'application/json' },
+        body: extra
     });
-    if (response.ok) {
-        return true;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return createOptionalExtra(extra);
-            }
-        }
-        console.error('Error creating optional extra:', response.statusText);
-    }
-    return false;
 }
 
 async function getOptionalExtraById(extraId) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch(`/read_optional_extra?mode=by_id&extra_id=${extraId}`, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return getOptionalExtraById(extraId);
-            }
-        }
-        console.error('Error fetching optional extra:', response.statusText);
-    }
-    return null;
+    return await adminApiRequest({ url: `/read_optional_extra?mode=by_id&extra_id=${extraId}` });
 }
 
 async function updateOptionalExtra(extra) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/update_optional_extra', {
+    return await adminApiRequest({
+        url: '/update_optional_extra',
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(extra)
+        headers: { 'Content-Type': 'application/json' },
+        body: extra
     });
-    if (response.ok) {
-        return true;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return updateOptionalExtra(extra);
-            }
-        }
-        console.error('Error updating optional extra:', response.statusText);
-    }
-    return false;
 }
 
 async function deleteOptionalExtra(extraId) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch(`/delete_optional_extra?extra_id=${extraId}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
+    return await adminApiRequest({
+        url: `/delete_optional_extra?extra_id=${extraId}`,
+        method: 'DELETE'
     });
-    if (response.ok) {
-        return true;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return deleteOptionalExtra(extraId);
-            }
-        }
-        console.error('Error deleting optional extra:', response.statusText);
-    }
-    return false;
 }
 
-async function createCarInsurancePolicy(policy) {
-    const accessToken = localStorage.getItem('access_token');
-    const response = await fetch('/create_car_insurance_policy', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-        },
-        body: JSON.stringify(policy)
+async function deleteUser(userId) {
+    return await adminApiRequest({
+        url: `/delete_user?user_id=${userId}`,
+        method: 'DELETE'
     });
-    if (response.ok) {
-        return true;
-    } else if (response.status === 401) {
-        // if the token is expired refresh the token
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (refreshToken) {
-            const refreshResponse = await window.refreshToken();
-            if (refreshResponse) {
-                return createCarInsurancePolicy(policy);
-            }
-        }
-        console.error('Error creating car insurance policy:', response.statusText);
-    }
-    return false;
 }
