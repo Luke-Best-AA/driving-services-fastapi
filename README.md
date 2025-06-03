@@ -189,7 +189,7 @@ END
 GO
 ```
 
-Insert Dummy Records
+Insert Dummy Records - Records created below are for demonstration purposes. There are at least 10 records in each table in production.
 ```sql
 -- Use the Database
 USE DrivingServiceManagement;
