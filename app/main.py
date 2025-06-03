@@ -4,8 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.exceptions import RequestValidationError
-
-from starlette.requests import Request
+from pydantic import BaseModel
 
 from .user import User
 from .optional_extra import OptionalExtra
@@ -87,7 +86,8 @@ def exception_handler(func):
         try:
             return await func(*args, **kwargs)
         except ValueError as e:
-            if isinstance(e.args[0], APIResponse):
+            # Ensure e.args exists and is not empty
+            if hasattr(e, "args") and e.args and isinstance(e.args[0], APIResponse):
                 api_response = e.args[0]
                 raise HTTPException(
                     status_code=api_response.status,
@@ -187,7 +187,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme)):
         access_token_data = {
             "user_id": user_id,
             "username": username,
-            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=15)  # Access token expires in 15 minutes
+            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRY_MINS)  # Access token expires in 15 minutes
         }
         access_token = jwt.encode(access_token_data, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -195,7 +195,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme)):
         refresh_token_data = {
             "user_id": user_id,
             "username": username,
-            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=7)  # Refresh token expires in 7 days
+            "exp": datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=REFRESH_TOKEN_EXPIRY_HOURS)  # Refresh token expires in 7 days
         }
         new_refresh_token = jwt.encode(refresh_token_data, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -220,6 +220,7 @@ async def refresh_token(refresh_token: str = Depends(oauth2_scheme)):
         content={
             "access_token": access_token,
             "refresh_token": new_refresh_token,
+            "token_type": "bearer",
             "user": {
                 "user_id": user.user_id,
                 "username": user.username,
@@ -344,6 +345,76 @@ async def update_user(updated_user: User, token_data: dict = Depends(verify_toke
         content={
             "message": Messages.USER_UPDATED_SUCCESS,
             "user": updated_user.model_dump()
+        },
+        status_code=HTTPStatus.OK
+    )
+
+class UpdateUserPasswordPayload(BaseModel):
+    user_id: int
+    existing_password: str
+    new_password: str
+
+@app.patch("/update_user_password")
+@exception_handler
+async def update_user_password(
+    payload: UpdateUserPasswordPayload,
+    token_data: dict = Depends(verify_token)
+):
+    with DBConnect(SERVER, DATABASE, TRUSTED_CONNECTION, DB_USERNAME, DB_PASSWORD) as db:
+        cursor = db.connection.cursor()
+        service = UserService(cursor)
+        requesting_user = await service.get_user_by_id(token_data["user_id"])
+        service.check_update_permissions(requesting_user, payload.user_id)
+        validate_required_fields({
+            "user_id": payload.user_id,
+            "existing_password": payload.existing_password,
+            "new_password": payload.new_password
+        })
+
+        # Check if the existing password is correct or if admin is allowed to override
+        user = await service.get_user_by_id(payload.user_id, requesting_user, password=True)
+        user_new_password = User(
+            user_id=user.user_id,
+            username=user.username,
+            password=payload.new_password,
+            email=user.email,
+            is_admin=user.is_admin
+        )
+        user_new_password.validate_user_values()
+
+        if payload.existing_password == "":
+            # Only admin can update password without existing password
+            if not requesting_user.is_admin:
+                raise ValueError(
+                    APIResponse(
+                        status=HTTPStatus.FORBIDDEN,
+                        message=Messages.USER_NO_PERMISSION,
+                        data=None
+                    )
+                )
+        else:
+            if not service.verify_password(payload.existing_password, user.password):
+                raise ValueError(
+                    APIResponse(
+                        status=HTTPStatus.UNAUTHORIZED,
+                        message=Messages.USER_INVALID_CREDENTIALS,
+                        data=None
+                    )
+                )
+            if payload.new_password == user.password:
+                raise ValueError(
+                    APIResponse(
+                        status=HTTPStatus.BAD_REQUEST,
+                        message=Messages.NO_CHANGE,
+                        data=None
+                    )
+                )
+
+        await service.update_user_password(payload.user_id, payload.new_password)
+    return JSONResponse(
+        content={
+            "message": Messages.USER_PASSWORD_UPDATED_SUCCESS,
+            "user_id": payload.user_id
         },
         status_code=HTTPStatus.OK
     )

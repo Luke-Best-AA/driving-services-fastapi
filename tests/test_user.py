@@ -29,7 +29,7 @@ def test_user_short_username():
     user = User(**data)
     with pytest.raises(ValueError) as exc:
         user.validate_user_values()
-    assert "at least 5 characters" in str(exc.value)
+    assert "at least 4 characters" in str(exc.value)
 
 def test_user_invalid_password():
     data = valid_user_dict()
@@ -52,7 +52,7 @@ def test_user_invalid_email():
     user = User(**data)
     with pytest.raises(ValueError) as exc:
         user.validate_user_values()
-    assert "email must be a valid email address" in str(exc.value)
+    assert "email must be in format: name@example.com" in str(exc.value)
 
 def test_user_invalid_is_admin():
     data = valid_user_dict()

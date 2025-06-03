@@ -381,3 +381,18 @@ input[type="checkbox"]:disabled:hover {
     box-shadow: none;
 }
 
+.error-message {
+    color: #dc2626;
+    font-size: 15px;
+    text-align: center;
+    line-height: 17px;
+    margin-top: 20px;
+}
+
+.success-message {
+    color: #16a34a;
+    font-size: 15px;
+    text-align: center;
+    line-height: 17px;
+    margin-top: 20px;
+}

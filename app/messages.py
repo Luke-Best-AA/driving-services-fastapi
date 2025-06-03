@@ -2,7 +2,7 @@ class Messages:
     # General messages
     NO_CHANGE = "No changes detected"
     INVALID_FIELD = "Invalid field: {}"
-    INVALID_FIELD_VALUE = "Invalid {} for field: {}"
+    INVALID_FIELD_VALUE = "Invalid: {} {}"
     INVALID_TYPE = "Invalid type for field"
     FIELD_REQUIRED = "Field '{}' is required"
     DUPLICATION_ERROR = "Duplicate entry"
@@ -29,6 +29,7 @@ class Messages:
     USER_UPDATED_SUCCESS = "User updated successfully"
     USER_DELETED_SUCCESS = "User deleted successfully"
     USER_INVALID_READ_MODE = "Invalid mode. Use 'list_all', 'filter', 'by_id' or 'myself'."
+    USER_PASSWORD_UPDATED_SUCCESS = "User password updated successfully"
 
     # Optional Extra-related messages
     OPTIONAL_EXTRA_NOT_FOUND = "Optional extra not found"

@@ -98,50 +98,68 @@ document.addEventListener('DOMContentLoaded', async function () {
             setTimeout(() => {
                 const popupForm = document.getElementById('policy-form');
                 if (popupForm) {
-                    popupForm.onsubmit = async function(event) {
-                        event.preventDefault();
-                        const form = event.target;
-                        const formData = new FormData(form);
+                    popupForm.onsubmit = null;
 
-                        // Build the policy object
-                        const updated_policy = {
-                            ci_policy_id: parseInt(formData.get('policy_id'), 10),
-                            user_id: parseInt(formData.get('user_id'), 10),
-                            policy_number: formData.get('policy_number'),
-                            start_date: formData.get('start_date'),
-                            end_date: formData.get('end_date'),
-                            make: formData.get('make'),
-                            model: formData.get('model'),
-                            vrn: formData.get('vrn'),
-                            coverage: formData.get('coverage')
-                        };
+                    setTimeout(() => {
+                        const updateForm = document.getElementById('policy-form');
+                        const errorDiv = document.getElementById('update-policy-error');
+                        if (updateForm) {
+                            updateForm.addEventListener('submit', async function (e) {
+                                e.preventDefault();
+                                if (errorDiv) {
+                                    errorDiv.style.display = 'none';
+                                    errorDiv.textContent = '';
+                                }
+                                // Collect form data
+                                const formData = new FormData(updateForm);
+                                // Build updated_policy object
+                                const updated_policy = {
+                                    ci_policy_id: parseInt(formData.get('policy_id'), 10),
+                                    user_id: parseInt(formData.get('user_id'), 10),
+                                    policy_number: formData.get('policy_number'),
+                                    start_date: formData.get('start_date'),
+                                    end_date: formData.get('end_date'),
+                                    make: formData.get('make'),
+                                    model: formData.get('model'),
+                                    vrn: formData.get('vrn'),
+                                    coverage: formData.get('coverage')
+                                };
 
-                        // Get selected optional extra IDs
-                        const optionals = formData.getAll('optionals');
-                        let optional_extras = [];
-                        if (optionals.length > 0) {
-                            // Fetch all optional extras and filter by selected IDs
-                            const allExtras = await window.fetchAllOptionalExtras();
-                            optional_extras = allExtras.filter(extra =>
-                                optionals.includes(String(extra.extra_id))
-                            );
+                                // Get selected optional extra IDs
+                                const optionalsList = updateForm.querySelector("#optionals-list");
+                                const optionals = Array.from(optionalsList.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+
+                                let optional_extras = [];
+                                if (optionals.length > 0) {
+                                    // Fetch all optional extras and filter by selected IDs
+                                    const allExtras = await window.fetchAllOptionalExtras();
+                                    optional_extras = allExtras.filter(extra =>
+                                        optionals.includes(String(extra.extra_id))
+                                    );
+                                }
+
+                                // Compose the request body
+                                const data = {
+                                    updated_policy,
+                                    optional_extras
+                                };
+
+                                // Call API
+                                const result = await window.updateCarInsurancePolicy(data);
+                                // alert json result
+                                console.log(result);
+                                if (result.success) {
+                                    window.closePopup();
+                                    location.reload();
+                                } else {
+                                    if (errorDiv) {
+                                        errorDiv.textContent = window.extractApiErrorMessage(result.data || result.message);
+                                        errorDiv.style.display = 'block';
+                                    }
+                                }
+                            });
                         }
-
-                        // Compose the request body
-                        const body = {
-                            updated_policy,
-                            optional_extras
-                        };
-
-                        await window.updateCarInsurancePolicy(body);
-                        const popupContainer = document.getElementById('popup-container');
-                        const overlay = document.getElementById('popup-overlay');
-                        if (popupContainer) popupContainer.style.display = 'none';
-                        if (overlay) overlay.style.display = 'none';
-
-                        // refresh page
-                        location.reload();
-                    }
+                    }, 0);
                 }
             });         
         });
@@ -261,15 +279,19 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Attach submit handler after form is in DOM
             setTimeout(() => {
                 const popupForm = document.getElementById('policy-create-form');
+                const errorDiv = document.getElementById('create-policy-error');
                 if (popupForm) {
-                    popupForm.onsubmit = async function(event) {
-                        event.preventDefault();
-                        const form = event.target;
-                        const formData = new FormData(form);
-
-                        // Build the policy object
+                    popupForm.addEventListener('submit', async function (e) {
+                        e.preventDefault();
+                        if (errorDiv) {
+                            errorDiv.style.display = 'none';
+                            errorDiv.textContent = '';
+                        }
+                        // Collect form data
+                        const formData = new FormData(popupForm);
+                        // Build policy object
                         const policy = {
-                            ci_policy_id: 0,
+                            ci_policy_id: 0, // For create, backend should ignore or auto-generate
                             user_id: parseInt(formData.get('user_id'), 10),
                             policy_number: formData.get('policy_number'),
                             start_date: formData.get('start_date'),
@@ -281,7 +303,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                         };
 
                         // Get selected optional extra IDs
-                        const optionals = formData.getAll('optionals');
+                        const optionalsList = popupForm.querySelector("#create-optionals-list");
+                        const optionals = Array.from(optionalsList.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value);
+
                         let optional_extras = [];
                         if (optionals.length > 0) {
                             // Fetch all optional extras and filter by selected IDs
@@ -292,21 +316,22 @@ document.addEventListener('DOMContentLoaded', async function () {
                         }
 
                         // Compose the request body
-                        const body = {
+                        const data = {
                             policy,
                             optional_extras
                         };
-
-                        await window.createCarInsurancePolicy(body);
-                        const popupContainer = document.getElementById('popup-container');
-                        const overlay = document.getElementById('popup-overlay');
-                        if (popupContainer) popupContainer.style.display = 'none';
-                        if (overlay) overlay.style.display = 'none';
-
-                        alert(`Policy ${formData.get('policy_number')} created successfully`);
-                        // refresh page
-                        location.reload();
-                    };
+                        // Call API
+                        const result = await window.createCarInsurancePolicy(data);
+                        if (result.success) {
+                            window.closePopup();
+                            location.reload();
+                        } else {
+                            if (errorDiv) {
+                                errorDiv.textContent = window.extractApiErrorMessage(result.data || result.message);
+                                errorDiv.style.display = 'block';
+                            }
+                        }
+                    });
                 }
             }, 0);
         });

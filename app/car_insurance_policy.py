@@ -5,6 +5,7 @@ import re
 
 from .response import APIResponse
 from .messages import Messages
+from .field_formatting import capitalise_first
 
 class CarInsurancePolicy(BaseModel):
     ci_policy_id: Optional[int] = Field(None, alias='ci_policy_id')
@@ -33,40 +34,65 @@ class CarInsurancePolicy(BaseModel):
 
     async def validate_car_insurance_policy_values(self):
         validation_errors = []
-        if not self.user_id or not self.vrn or not self.make or not self.model or not self.policy_number or not self.start_date or not self.end_date or not self.coverage:
-            validation_errors.append("All fields are required.")
-        # for vrn, make, model, policy_number, coverage
-        if not isinstance(self.vrn, str) or not self.vrn.isalnum() or len(self.vrn) >= 10:
-            validation_errors.append("VRN must be alphanumeric and less than 10 characters.")
+        error_field = None
 
-        if not isinstance(self.make, str) or not re.match(r'^[\w\s-]+$', self.make) or len(self.make) >= 20:
-            validation_errors.append("Make must be alphanumeric (spaces and hyphens allowed) and less than 20 characters.")
+        if not error_field:
+            if not self.user_id or not self.vrn or not self.make or not self.model or not self.policy_number or not self.start_date or not self.end_date or not self.coverage:
+                validation_errors.append("all fields are required.")
+                error_field = "required"
+        if not error_field:
+            if not isinstance(self.policy_number, str) or not self.policy_number.isalnum():
+                validation_errors.append("must be alphanumeric.")
+                error_field = "policy number"
+            elif len(self.policy_number) > 20:
+                validation_errors.append("must not be longer than 20 characters.")
+                error_field = "policy number"        
+        if not error_field:
+            if not isinstance(self.vrn, str) or not self.vrn.isalnum():
+                validation_errors.append("must be alphanumeric.")
+                error_field = "VRN"
+            elif len(self.vrn) > 10:
+                validation_errors.append("must not be longer than 10 characters.")
+                error_field = "VRN"
+        if not error_field:
+            if not isinstance(self.make, str) or not re.match(r'^[\w\s-]+$', self.make):
+                validation_errors.append("must be alphanumeric (spaces and hyphens allowed).")
+                error_field = "make"
+            elif len(self.make) > 20:
+                validation_errors.append("must not be longer than 20 characters.")
+                error_field = "make"
+        if not error_field:
+            if not isinstance(self.model, str) or not re.match(r'^[\w\s-]+$', self.model):
+                validation_errors.append("must be alphanumeric (spaces and hyphens allowed).")
+                error_field = "model"
+            elif len(self.model) > 20:
+                validation_errors.append("must not be longer than 20 characters.")
+                error_field = "model"
+        if not error_field:
+            if not isinstance(self.coverage, str) or not self.coverage.replace(" ", "").isalnum():
+                validation_errors.append("must be alphanumeric (spaces allowed).")
+                error_field = "coverage"
+            elif len(self.coverage) > 30:
+                validation_errors.append("must not be longer than 30 characters.")
+                error_field = "coverage"
+        if not error_field:
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", self.start_date):
+                validation_errors.append("must be in YYYY-MM-DD format.")
+                error_field = "start date"
+        if not error_field:
+            if not re.match(r"^\d{4}-\d{2}-\d{2}$", self.end_date):
+                validation_errors.append("must be in YYYY-MM-DD format.")
+                error_field = "end date"
+        if not error_field:
+            if self.start_date > self.end_date:
+                validation_errors.append("must be before end date.")
+                error_field = "start date"
 
-        if not isinstance(self.model, str) or not re.match(r'^[\w\s-]+$', self.model) or len(self.model) >= 20:
-            validation_errors.append("Model must be alphanumeric (spaces and hyphens allowed) and less than 20 characters.")
-
-        if not isinstance(self.policy_number, str) or not self.policy_number.isalnum() or len(self.policy_number) >= 20:
-            validation_errors.append("Policy number must be alphanumeric and less than 20 characters.")
-
-        if not isinstance(self.coverage, str) or not self.coverage.replace(" ", "").isalnum() or len(self.coverage) >= 20:
-            validation_errors.append("Coverage must be alphanumeric (spaces allowed) and less than 20 characters.")
-
-        # Validate date format (YYYY-MM-DD)
-        if not re.match(r"^\d{4}-\d{2}-\d{2}$", self.start_date):
-            validation_errors.append("Start date must be in YYYY-MM-DD format.")
-
-        if not re.match(r"^\d{4}-\d{2}-\d{2}$", self.end_date):
-            validation_errors.append("End date must be in YYYY-MM-DD format.")
-
-        # Validate date order
-        if self.start_date > self.end_date:
-            validation_errors.append("Start date must be before end date.")
-            
         if validation_errors:
             raise ValueError(
                 APIResponse(
                     status=HTTPStatus.BAD_REQUEST,
-                    message=Messages.INVALID_FIELD_VALUE.format(", ".join(validation_errors), "car insurance policy"),
+                    message=Messages.INVALID_FIELD_VALUE.format(capitalise_first(error_field), validation_errors[0]),
                     data=None
                 )
             )
