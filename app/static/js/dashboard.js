@@ -329,6 +329,18 @@ document.addEventListener('DOMContentLoaded', async function () {
             }, 0);
         });
     });
+
+    // Hide delete buttons for non-admin users (fix: do not redeclare userData/user)
+    const isAdmin = user && user.is_admin;
+    if (!isAdmin) {
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.style.display = 'none';
+        });
+        // Also remove admin-only class from body for CSS fallback
+        document.body.classList.remove('is-admin');
+    } else {
+        document.body.classList.add('is-admin');
+    }
 });
 
 // define function to get car insurance by myself
