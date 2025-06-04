@@ -1683,3 +1683,31 @@ def test_secret_key_not_set_in_env(mocker):
         import app.main
         importlib.reload(app.main)  # Reload the module to apply the mock
     assert str(exc_info.value) == "SECRET_KEY is not set in the environment variables"
+
+def test_register_user_valid(mocker):
+    """Test registering a valid user (public endpoint, any role)"""
+    user_data = {
+        "username": "TestUser1",
+        "password": "5f4dcc3b5aa765d61d8327deb882cf99",
+        "email": "testuser1@example.com",
+        "is_admin": True
+    }
+    mocker.patch("app.services.user_service.UserService.create_user", return_value=User(user_id=1, **user_data))
+    response = client.post("/register_user", json=user_data)
+    assert response.status_code == 201
+    assert response.json()["message"] == Messages.USER_CREATED_SUCCESS
+    assert response.json()["user"]["username"] == user_data["username"]
+    assert response.json()["user"]["is_admin"] is True
+
+
+def test_register_user_invalid(mocker):
+    """Test registering a user with invalid data (should fail validation)"""
+    user_data = {
+        "username": "12",  # Too short, not starting with letter
+        "password": "badpass",
+        "email": "notanemail",
+        "is_admin": False
+    }
+    response = client.post("/register_user", json=user_data)
+    assert response.status_code == 400
+    assert "username" in response.text or "email" in response.text
