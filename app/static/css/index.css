@@ -144,6 +144,105 @@
     display: block;
 }
 
+.register-link-container {
+    margin-top: 18px;
+    text-align: center;
+}
+
+#show-register-link {
+    color: #6366f1;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+#show-register-link:hover {
+    color: #3742fa;
+}
+
+#form-register {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto;
+    align-items: center;
+}
+#form-register input[type="text"],
+#form-register input[type="password"],
+#form-register button[type="submit"] {
+    width: 220px;
+    box-sizing: border-box;
+}
+#form-register input[type="text"],
+#form-register input[type="password"],
+#form-register input[type="email"] {
+    padding: 10px;
+    border: 1px solid #bfc7d1;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border 0.3s, box-shadow 0.3s;
+    outline: none;
+}
+#form-register input[type="text"]:focus,
+#form-register input[type="password"]:focus,
+#form-register input[type="email"]:focus {
+    border: 1.5px solid #6366f1;
+    box-shadow: 0 0 0 2px #a5b4fc44;
+}
+#form-register button[type="submit"] {
+    padding: 10px;
+    background: linear-gradient(90deg, #6366f1 0%, #7b8dfb 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.8s;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+}
+#form-register button[type="submit"]:hover {
+    background: linear-gradient(90deg, #7b8dfb 0%, #6366f1 100%);
+    transform: translateY(-2px) scale(1.01);
+}
+#form-register-error-msg {
+    color: #e11d48;
+    margin-top: 10px;
+    min-height: 20px;
+    font-size: 1rem;
+    text-align: center;
+    display: block;
+}
+.register-success-msg {
+    color: #16a34a;
+    font-size: 1.1rem;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.register-admin-label {
+    display: flex;
+    align-items: center;
+    background: #f3f4f6;
+    border: 1.5px solid #bfc7d1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 8px 0 0 0;
+    font-size: 1rem;
+    color: #333;
+    width: 220px;
+    box-sizing: border-box;
+    gap: 8px;
+}
+#register-is-admin {
+    accent-color: #6366f1;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+}
+
 /* Responsive for tablet and below: stack header and login vertically */
 @media (max-width: 900px) {
     #home-content {
