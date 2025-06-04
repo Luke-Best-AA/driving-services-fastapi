@@ -73,3 +73,26 @@ def test_user_is_admin_int_false():
     user = User(**data)
     assert user.validate_user_values() is True
     assert user.is_admin is False
+
+def test_user_register_admin_and_non_admin():
+    """Test that both admin and non-admin users can be created via the model and validation."""
+    admin_data = {
+        "user_id": 0,
+        "username": "AdminGuy",
+        "password": "5f4dcc3b5aa765d61d8327deb882cf99",
+        "email": "admin@example.com",
+        "is_admin": True
+    }
+    non_admin_data = {
+        "user_id": 0,
+        "username": "NormalUser",
+        "password": "5f4dcc3b5aa765d61d8327deb882cf99",
+        "email": "user@example.com",
+        "is_admin": False
+    }
+    admin_user = User(**admin_data)
+    non_admin_user = User(**non_admin_data)
+    assert admin_user.validate_user_values() is True
+    assert non_admin_user.validate_user_values() is True
+    assert admin_user.is_admin is True
+    assert non_admin_user.is_admin is False

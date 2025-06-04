@@ -2,6 +2,13 @@ const errorElement = document.getElementById('form-login-error-msg');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
 const loginForm = document.getElementById('form-login');
+const showRegisterLink = document.getElementById('show-register-link');
+const popupOverlay = document.getElementById('popup-overlay');
+const popupContainer = document.getElementById('popup-container');
+const popupContent = document.getElementById('popup-content');
+const popupClose = document.getElementById('popup-close');
+const popupTitle = document.getElementById('popup-title');
+const popupBody = document.getElementById('popup-body');
 
 // on document load set focus to username input
 document.addEventListener('DOMContentLoaded', () => {
@@ -48,3 +55,76 @@ loginForm.addEventListener('submit', async function(event) {
         errorElement.style.display = 'block';
     }
 });
+
+// Helper to show popup
+function showPopup(title, bodyHtml) {
+    popupTitle.textContent = title;
+    popupBody.innerHTML = bodyHtml;
+    window.openPopup();
+}
+
+// Show register popup when link clicked
+showRegisterLink.addEventListener('click', function(e) {
+    e.preventDefault();
+    const template = document.getElementById('register-form-template');
+    window.showPopup('Register', template.innerHTML);
+    // Focus username
+    setTimeout(() => {
+        const regUser = document.getElementById('register-username');
+        if (regUser) regUser.focus();
+    }, 100);
+    // Add submit handler
+    const regForm = document.getElementById('form-register');
+    regForm.addEventListener('submit', handleRegisterSubmit);
+});
+
+// Registration handler (no popup logic here)
+async function handleRegisterSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const username = form.querySelector('#register-username').value.trim();
+    const password = form.querySelector('#register-password').value;
+    const password2 = form.querySelector('#register-password2').value;
+    const email = form.querySelector('#register-email').value.trim();
+    const isAdmin = form.querySelector('#register-is-admin').checked;
+    const errorMsg = document.getElementById('form-register-error-msg');
+    errorMsg.innerText = '';
+    // Simple client validation
+    if (!username || !password || !password2 || !email) {
+        errorMsg.innerText = 'All fields are required.';
+        return;
+    }
+    if (password !== password2) {
+        errorMsg.innerText = 'Passwords do not match.';
+        return;
+    }
+    // Prepare JSON body for API
+    const body = {
+        user_id: 0,
+        username: username,
+        password: md5(password),
+        email: email,
+        is_admin: isAdmin
+    };
+    try {
+        const response = await fetch('/register_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        if (response.ok) {
+            // Success: show success message using main.js popup logic
+            if (window.showPopup) {
+                window.showPopup('Registration Successful', '<div class="register-success-msg">Registration successful! Please log in.</div>');
+                setTimeout(() => window.hidePopup && window.hidePopup(), 2000);
+            }
+        } else {
+            const errorData = await response.json();
+            errorMsg.innerText = errorData.detail || 'Registration failed.';
+        }
+    } catch (err) {
+        errorMsg.innerText = 'Network error.';
+    }
+}

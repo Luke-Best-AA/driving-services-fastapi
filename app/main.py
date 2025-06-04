@@ -673,6 +673,28 @@ async def delete_car_insurance_policy(
         status_code=HTTPStatus.OK
     )
 
+@app.post("/register_user")
+@exception_handler
+async def register_user(user: User):
+    """
+    Public endpoint to register a new user. No authentication required.
+    Any role (admin or non-admin) can be created, but all validations apply.
+    """
+    Debug.log(f"Registering new user: {user.username}")
+    validate_required_fields({"user": user})
+    user.validate_user_values()
+    with DBConnect(SERVER, DATABASE, TRUSTED_CONNECTION, DB_USERNAME, DB_PASSWORD) as db:
+        cursor = db.connection.cursor()
+        service = UserService(cursor)
+        user = await service.create_user(user)
+    return JSONResponse(
+        content={
+            "message": Messages.USER_CREATED_SUCCESS,
+            "user": user.model_dump()
+        },
+        status_code=HTTPStatus.CREATED
+    )
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse(request, "index.html", {"request": request})

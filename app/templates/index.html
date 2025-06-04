@@ -25,9 +25,26 @@
                     <button type="submit">Log In</button>
                 </form>
                 <span id="form-login-error-msg"></span>
+                <div class="register-link-container">
+                    <a href="#" id="show-register-link">Don't have an account? Register</a>
+                </div>
             </div>
         </section>
     </div>
+    <!-- Registration form for popup (hidden, will be injected into popup-body) -->
+    <template id="register-form-template">
+        <form id="form-register">
+            <input type="text" id="register-username" name="username" placeholder="Username" required>
+            <input type="password" id="register-password" name="password" placeholder="Password" required>
+            <input type="password" id="register-password2" name="password2" placeholder="Confirm Password" required>
+            <input type="email" id="register-email" name="email" placeholder="Email" required>
+            <label class="register-admin-label">
+                <input type="checkbox" id="register-is-admin" name="is_admin" value="1"> Register as admin
+            </label>
+            <button type="submit">Register</button>
+        </form>
+        <span id="form-register-error-msg"></span>
+    </template>
 {% endblock %}
 
 {% block scripts %}
