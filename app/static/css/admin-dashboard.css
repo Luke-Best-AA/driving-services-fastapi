@@ -258,11 +258,35 @@
     margin-top: 8px;
 }
 
-/* Keep the confirm button on the right in the copy user id section */
-.definer-confirm-btn {
+.definer-confirm-input {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: "label input button";
+    align-items: center;
+    gap: 10px;
+}
+
+.definer-confirm-input label {
+    grid-area: label;
+    margin-bottom: 0;
+    margin-right: 8px;
+    white-space: nowrap;
+}
+
+.definer-confirm-input input[type="number"] {
+    grid-area: input;
+    width: 50%;
+    box-sizing: border-box;
+}
+
+.definer-confirm-input .definer-confirm-btn {
+    grid-area: button;
+    justify-self: end;
+    min-width: 40px;
     width: auto;
-    min-width: 70px;
-    float: right;
+    padding: 6px 12px;
+    font-size: 13px;
+    margin-left: 8px;
 }
 
 .list-table {
