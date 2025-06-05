@@ -21,7 +21,13 @@
                 <div id="popup-body"></div>
             </div>
         </div>
-        </div>
+        {% block session_expired_popup %}
+        <!-- Session Expired Popup Template (hidden, used by JS) -->
+        <template id="session-expired-popup-template">
+            <p>Your session has expired. Please log in again.</p>
+            <button id="session-expired-ok-btn" class="login-again-btn">Login again</button>
+        </template>
+        {% endblock %}
         <main id="main-content">
             {% block content %}{% endblock %}
         </main>
