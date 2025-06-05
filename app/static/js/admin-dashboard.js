@@ -11,7 +11,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (!approved) {
-        window.location.href = '/';
+        window.showSessionExpiredPopup();
+        return;
     }
     else {
         // Use sessionStorage to prevent popup from showing too frequently (30 min)

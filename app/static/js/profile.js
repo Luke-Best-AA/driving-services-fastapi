@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Get user info using the global method
     const user = await window.getUserByMyself();
     if (!user) {
+        window.showSessionExpiredPopup();
         console.error('No user found');
         return;
     }

@@ -367,6 +367,8 @@ async function getCarInsuranceByMyself() {
                 return data;
             }
         }
+        // Show session expired popup if no refresh token or still fails
+        window.showSessionExpiredPopup();
         console.error('Error fetching car insurance policy:', response.statusText);
     }
 }

@@ -9,11 +9,9 @@
                     e.preventDefault();
                     return;
                 }
-                // remove tokens from local storage
-                localStorage.removeItem('access_token');
-                localStorage.removeItem('refresh_token');
-                localStorage.removeItem('user');
-                window.location.href = '/';
+                // Use session expired popup for logout
+                e.preventDefault();
+                window.showSessionExpiredPopup();
             }
             else {
                 window.location.href = '/register';
@@ -139,13 +137,8 @@
         })
         .catch(error => {
             console.error('Error verifying token:', error);
-            // Handle error if needed
-            // For example, you can redirect to the login page
-            // remove tokens from local storage
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('user');
-            window.location.href = '/';
+            // Show session expired popup on token verification error
+            window.showSessionExpiredPopup();
         });
     }
     else {
@@ -211,11 +204,8 @@ async function refreshToken() {
         return { accessToken, refreshToken, user };
     } else {
         console.error('Error refreshing token:', response.statusText);
-        // redirect to login page
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        window.location.href = '/';
+        // Show session expired popup on refresh failure
+        window.showSessionExpiredPopup();
     }
 }
 
@@ -359,7 +349,9 @@ async function handleApiResponse({ url, method = 'GET', headers = {}, body = nul
                 return await handleApiResponse({ url, method, headers, body, retry: false });
             }
         }
-        return { success: false, status: 401, message: 'Unauthorized' };
+        // If refresh fails, show session expired popup
+        window.showSessionExpiredPopup();
+        return { success: false, status: 401, message: 'Session expired' };
     } else if ([400, 422].includes(response.status)) {
         let errorData;
         try {
@@ -530,6 +522,45 @@ function extractApiErrorMessage(error) {
     return 'An error occurred.';
 }
 
+// Show session expired popup, clear storage, and redirect after dismiss
+function showSessionExpiredPopup() {
+    // Clear tokens and user info
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    // Use the popup from base.html
+    if (window.openPopup && window.closePopup) {
+        const popupTitle = document.getElementById('popup-title');
+        const popupBody = document.getElementById('popup-body');
+        if (popupTitle) popupTitle.textContent = 'Session Expired';
+        if (popupBody) {
+            // Use the template from base.html
+            const template = document.getElementById('session-expired-popup-template');
+            if (template) {
+                popupBody.innerHTML = template.innerHTML;
+            } else {
+                popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p>' +
+                    '<button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
+            }
+        }
+        window.openPopup();
+        // Add event listener for the button
+        setTimeout(() => {
+            const okBtn = document.getElementById('session-expired-ok-btn');
+            if (okBtn) {
+                okBtn.onclick = function() {
+                    window.closePopup();
+                    window.location.href = '/';
+                };
+            }
+        }, 0);
+    } else {
+        // Fallback: alert and redirect
+        alert('Your session has expired. Please log in again.');
+        window.location.href = '/';
+    }
+}
+
 // Export to window for global access to ensure availability
 window.refreshToken = refreshToken;
 window.getUserById = getUserById;
@@ -549,3 +580,4 @@ window.createEndDate = createEndDate;
 window.dateToDatabaseFormat = dateToDatabaseFormat;
 window.extractApiErrorMessage = extractApiErrorMessage;
 window.handleApiResponse = handleApiResponse;
+window.showSessionExpiredPopup = showSessionExpiredPopup;
