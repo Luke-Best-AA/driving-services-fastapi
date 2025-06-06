@@ -1,7 +1,7 @@
 import pytest
 from app.services.optional_extra_service import OptionalExtraService
-from app.optional_extra import OptionalExtra
-from app.messages import Messages
+from app.models.optional_extra import OptionalExtra
+from app.utils.messages import Messages
 
 @pytest.fixture
 def mock_cursor(mocker):

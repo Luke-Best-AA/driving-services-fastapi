@@ -1,10 +1,10 @@
 import pytest
 from app.services.car_insurance_policy_service import CarInsurancePolicyService
 from app.services.user_service import UserService
-from app.car_insurance_policy import CarInsurancePolicy
-from app.optional_extra import OptionalExtra
-from app.user import User
-from app.messages import Messages
+from app.models.car_insurance_policy import CarInsurancePolicy
+from app.models.optional_extra import OptionalExtra
+from app.models.user import User
+from app.utils.messages import Messages
 
 @pytest.fixture
 def mock_cursor(mocker):

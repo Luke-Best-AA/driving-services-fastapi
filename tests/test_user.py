@@ -1,5 +1,5 @@
 import pytest
-from app.user import User
+from app.models.user import User
 from pydantic import ValidationError
 
 def valid_user_dict():

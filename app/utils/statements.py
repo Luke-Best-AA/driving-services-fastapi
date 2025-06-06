@@ -1,6 +1,6 @@
 from .debug import Debug
 from .response import APIResponse
-from .messages import Messages
+from app.utils.messages import Messages
 from http import HTTPStatus
 
 from .error_constants import TYPE_CONVERSION_ERROR, UNIQUE_KEY_CONSTRAINT

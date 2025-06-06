@@ -1,9 +1,10 @@
 from fastapi.testclient import TestClient
 from fastapi import HTTPException
-from app.main import app, verify_token
-from app.user import User
-from app.messages import Messages
-from app.response import APIResponse
+from app.main import app
+from app.models.user import User
+from app.utils.messages import Messages
+from app.utils.response import APIResponse
+from app.utils.common import verify_token
 
 import datetime
 import pytest
@@ -143,7 +144,7 @@ def patch_user_and_service(mocker, user, policies, policies_with_extras):
     mocker.patch("app.services.car_insurance_policy_service.CarInsurancePolicyService.get_car_insurance_policy_by_user_id", return_value=policies)
     mocker.patch("app.services.car_insurance_policy_service.CarInsurancePolicyService.filter_car_insurance_policies", return_value=policies)
     mocker.patch("app.services.car_insurance_policy_service.CarInsurancePolicyService.get_policy_extras", return_value=policies_with_extras)
-    mocker.patch("app.main.verify_token", return_value={"user_id": user.user_id})
+    mocker.patch("app.utils.common.verify_token", return_value={"user_id": user.user_id})
 
 def mock_authenticate_user_success(user):
     async def _mock(self, username, password):
@@ -254,11 +255,11 @@ def test_verify_token_invalid():
 
 def test_create_user_valid(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock get_user_by_id to return the admin user
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate user_id 3 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate user_id 3 being created
 
     # Send a request to create a new user
     new_user_data = {
@@ -279,7 +280,7 @@ def test_create_user_valid(admin_token, mocker, valid_admin_user):
 def test_create_user_invalid(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock get_user_by_id to return the admin user
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     # validation error
@@ -295,7 +296,7 @@ def test_create_user_invalid(admin_token, mocker, valid_admin_user):
 
 def test_create_user_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
 
     # Send a request to create a new user
     new_user_data = {
@@ -311,10 +312,10 @@ def test_create_user_non_admin(non_admin_token, mocker, valid_non_admin_user):
 
 def test_create_user_duplicate(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database insert operation to raise a unique constraint error
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.CONFLICT, message=Messages.DUPLICATION_ERROR, data=None)))
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.CONFLICT, message=Messages.DUPLICATION_ERROR, data=None)))
 
     # Send a request to create a new user
     new_user_data = {
@@ -331,10 +332,10 @@ def test_create_user_duplicate(admin_token, mocker, valid_admin_user):
 # test that httpexception is raised if httpexception during database operation (error code 500)
 def test_create_user_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database insert operation to raise a generic database error
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
 
     # Send a request to create a new user
     new_user_data = {
@@ -350,10 +351,10 @@ def test_create_user_database_error(admin_token, mocker, valid_admin_user):
 
 def test_read_user_list_all_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database query for listing all users
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"user_id": 1, "username": "admin", "email": "admin@example.com", "is_admin": True},
         {"user_id": 2, "username": "user", "email": "user@example.com", "is_admin": False}
     ])
@@ -371,7 +372,7 @@ def test_read_user_list_all_admin(admin_token, mocker, valid_admin_user):
 def test_read_user_list_all_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Send a request to list all users
     response = client.get("/read_user", params={"mode": "list_all"}, headers={"Authorization": f"Bearer {non_admin_token}"})
     assert response.status_code == HTTPStatus.FORBIDDEN
@@ -379,11 +380,11 @@ def test_read_user_list_all_non_admin(non_admin_token, mocker, valid_non_admin_u
 
 def test_read_user_filter_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_admin", return_value=True)
 
     # Mock the database query for filtering users
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"user_id": 2, "username": "user", "email": "user@example.com", "is_admin": False}
     ])
 
@@ -399,7 +400,7 @@ def test_read_user_filter_admin(admin_token, mocker, valid_admin_user):
 def test_read_user_filter_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Send a request to filter users
     response = client.get("/read_user", params={"mode": "filter", "field": "username", "value": "user"}, headers={"Authorization": f"Bearer {non_admin_token}"})
     assert response.status_code == HTTPStatus.FORBIDDEN
@@ -408,10 +409,10 @@ def test_read_user_filter_non_admin(non_admin_token, mocker, valid_non_admin_use
 def test_read_user_by_id_admin(admin_token, mocker, valid_admin_user):
     # Admin can get Id not equal to their own
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database query for retrieving a user by ID
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"user_id": 2, "username": "user", "email": "user@example.com", "is_admin": False}
     ])
 
@@ -427,9 +428,9 @@ def test_read_user_by_id_admin(admin_token, mocker, valid_admin_user):
 def test_read_user_by_id_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database query for retrieving a user by ID
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"user_id": 2, "username": "user", "email": "user@example.com", "is_admin": False}
     ])
 
@@ -445,9 +446,9 @@ def test_read_user_by_id_non_admin(non_admin_token, mocker, valid_non_admin_user
 def test_read_user_by_id_non_admin_forbidden(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database query for retrieving a user by ID
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"user_id": 2, "username": "user", "email": "user@example.com", "is_admin": False}
     ])
 
@@ -458,10 +459,10 @@ def test_read_user_by_id_non_admin_forbidden(non_admin_token, mocker, valid_non_
 
 def test_read_user_myself(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
 
     # Mock the database query for retrieving the user's own details
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"user_id": 2, "username": "user", "email": "user@example.com", "is_admin": False}
     ])
 
@@ -506,10 +507,10 @@ def test_read_user_by_id_missing_user_id(admin_token):
 
 def test_update_user_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
 
     # Send a request to update a user
     updated_user_data = {
@@ -529,9 +530,9 @@ def test_update_user_valid_admin(admin_token, mocker, valid_admin_user):
 def test_update_user_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Send a request to update the user's own details
     updated_user_data = {
         "user_id": 2,
@@ -550,9 +551,9 @@ def test_update_user_valid_non_admin(non_admin_token, mocker, valid_non_admin_us
 def test_update_user_valid_non_admin_forbidden(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Send a request to update another user's details
     updated_user_data = {
         "user_id": 3,
@@ -568,9 +569,9 @@ def test_update_user_valid_non_admin_forbidden(non_admin_token, mocker, valid_no
 def test_update_user_invalid_id(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database update operation to raise an exception
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.USER_NOT_FOUND, data=None)))
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.USER_NOT_FOUND, data=None)))
     # Send a request to update a user with an invalid ID
     updated_user_data = {
         "user_id": 999,
@@ -586,9 +587,9 @@ def test_update_user_invalid_id(admin_token, mocker, valid_admin_user):
 def test_update_user_invalid_data(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Send a request to update a user with invalid data
     updated_user_data = {
         "user_id": 3,
@@ -602,10 +603,10 @@ def test_update_user_invalid_data(admin_token, mocker, valid_admin_user):
 
 def test_update_user_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database update operation to raise an exception
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
 
     # Send a request to update a user
     updated_user_data = {
@@ -621,7 +622,7 @@ def test_update_user_database_error(admin_token, mocker, valid_admin_user):
 
 def test_update_user_password_valid(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock get_user_by_id to return the admin user for both requesting and target user
     mocker.patch("app.services.user_service.UserService.get_user_by_id", side_effect=[valid_admin_user, valid_admin_user])
     # Mock check_update_permissions to allow update
@@ -646,7 +647,7 @@ def test_update_user_password_valid(admin_token, mocker, valid_admin_user):
     assert data["user_id"] == 1
 
 def test_update_user_password_invalid_existing_password(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", side_effect=[valid_admin_user, valid_admin_user])
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     # Existing password does not match
@@ -654,14 +655,14 @@ def test_update_user_password_invalid_existing_password(admin_token, mocker, val
 
     response = client.patch(
         "/update_user_password",
-        json={"user_id": 1, "existing_password": "wrongpass", "new_password": "newpass"},
+        json={"user_id": 1, "existing_password": "5f4dcc3b5aa765d61d8327deb882cf99", "new_password": "5f4dcc3b5aa765d61d8327deb882cf99"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {"detail": Messages.USER_INVALID_CREDENTIALS}
 
 def test_update_user_password_no_change(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # The user's current password is "samepass"
     user_with_password = valid_admin_user
     user_with_password.password = "482c811da5d5b4bc6d497ffa98491e38"
@@ -678,7 +679,7 @@ def test_update_user_password_no_change(admin_token, mocker, valid_admin_user):
     assert response.json() == {"detail": Messages.NO_CHANGE}
 
 def test_update_user_password_forbidden(non_admin_token, mocker, valid_non_admin_user):
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Simulate permission denied
     mocker.patch("app.services.user_service.UserService.get_user_by_id", side_effect=[valid_non_admin_user, valid_non_admin_user])
     mocker.patch("app.services.user_service.UserService.check_update_permissions", side_effect=ValueError(APIResponse(status=HTTPStatus.FORBIDDEN, message=Messages.USER_NO_PERMISSION_CHANGE, data=None)))
@@ -692,12 +693,12 @@ def test_update_user_password_forbidden(non_admin_token, mocker, valid_non_admin
     assert response.json() == {"detail": Messages.USER_NO_PERMISSION_CHANGE}
 
 def test_update_user_password_invalid_data(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", side_effect=[valid_admin_user, valid_admin_user])
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     mocker.patch("app.services.user_service.UserService.verify_password", return_value=True)
     # Patch User.validate_user_values to raise ValueError for invalid new password
-    mocker.patch("app.user.User.validate_user_values", side_effect=ValueError(APIResponse(status=HTTPStatus.BAD_REQUEST, message=Messages.INVALID_REQUEST_DATA, data=None)))
+    mocker.patch("app.models.user.User.validate_user_values", side_effect=ValueError(APIResponse(status=HTTPStatus.BAD_REQUEST, message=Messages.INVALID_REQUEST_DATA, data=None)))
 
     response = client.patch(
         "/update_user_password",
@@ -705,10 +706,10 @@ def test_update_user_password_invalid_data(admin_token, mocker, valid_admin_user
         headers={"Authorization": f"Bearer {admin_token}"}
     )
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert response.json()["detail"] == Messages.INVALID_REQUEST_DATA
+    assert response.json()["detail"] == Messages.INVALID_FIELD_VALUE.format("password", "must be a 32-character hexadecimal string")
 
 def test_update_user_password_database_error(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", side_effect=[valid_admin_user, valid_admin_user])
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     mocker.patch("app.services.user_service.UserService.verify_password", return_value=True)
@@ -717,9 +718,10 @@ def test_update_user_password_database_error(admin_token, mocker, valid_admin_us
 
     response = client.patch(
         "/update_user_password",
-        json={"user_id": 1, "existing_password": "oldpass", "new_password": "newpass"},
+        json={"user_id": 1, "existing_password": "482c811da5d5b4bc6d497ffa98491e38", "new_password": "5f4dcc3b5aa765d61d8327deb882cf99"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
+    print(response.text)
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert Messages.DB_ERROR in response.text
 
@@ -738,7 +740,7 @@ def test_update_user_password_admin_override(admin_token, mocker, valid_admin_us
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     mocker.patch("app.services.user_service.UserService.update_user_password", return_value=None)
-    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    mocker.patch("app.models.user.User.validate_user_values", return_value=None)
     payload = {
         "user_id": valid_admin_user.user_id,
         "existing_password": "",  # Admin override
@@ -748,12 +750,11 @@ def test_update_user_password_admin_override(admin_token, mocker, valid_admin_us
     assert response.status_code == HTTPStatus.OK
     assert response.json()["message"] == Messages.USER_PASSWORD_UPDATED_SUCCESS
 
-
 def test_update_user_password_non_admin_empty_existing_password(non_admin_token, mocker, valid_non_admin_user):
     # Non-admin cannot update password with empty existing_password
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_non_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
-    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    mocker.patch("app.models.user.User.validate_user_values", return_value=None)
     payload = {
         "user_id": valid_non_admin_user.user_id,
         "existing_password": "",  # Not allowed for non-admin
@@ -768,7 +769,7 @@ def test_update_user_password_existing_password_check(admin_token, mocker, valid
     # If existing_password is not empty, must match user's password
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
-    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    mocker.patch("app.models.user.User.validate_user_values", return_value=None)
     # Patch verify_password to return False (wrong password)
     mocker.patch("app.services.user_service.UserService.verify_password", return_value=False)
     payload = {
@@ -785,7 +786,7 @@ def test_update_user_password_existing_password_match(admin_token, mocker, valid
     # If existing_password is correct, password update should succeed
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
-    mocker.patch("app.user.User.validate_user_values", return_value=None)
+    mocker.patch("app.models.user.User.validate_user_values", return_value=None)
     mocker.patch("app.services.user_service.UserService.verify_password", return_value=True)
     mocker.patch("app.services.user_service.UserService.update_user_password", return_value=None)
     payload = {
@@ -799,10 +800,10 @@ def test_update_user_password_existing_password_match(admin_token, mocker, valid
 
 def test_delete_user_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database delete operation
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", return_value=None)
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", return_value=None)
 
     # Send a request to delete a user
     response = client.delete("/delete_user", params={"user_id": 3}, headers={"Authorization": f"Bearer {admin_token}"})
@@ -814,9 +815,9 @@ def test_delete_user_valid_admin(admin_token, mocker, valid_admin_user):
 def test_delete_user_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database delete operation
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", return_value=None)
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", return_value=None)
     # Send a request to delete the user's own account
     response = client.delete("/delete_user", params={"user_id": 2}, headers={"Authorization": f"Bearer {non_admin_token}"})
     assert response.status_code == HTTPStatus.FORBIDDEN
@@ -824,10 +825,10 @@ def test_delete_user_valid_non_admin(non_admin_token, mocker, valid_non_admin_us
 
 def test_delete_user_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database delete operation to raise an exception
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
 
     # Send a request to delete a user
     response = client.delete("/delete_user", params={"user_id": 3}, headers={"Authorization": f"Bearer {admin_token}"})
@@ -837,9 +838,9 @@ def test_delete_user_database_error(admin_token, mocker, valid_admin_user):
 def test_delete_user_invalid_id(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database delete operation to raise an exception
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.USER_NOT_FOUND, data=None)))
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.USER_NOT_FOUND, data=None)))
     # Send a request to delete a user with an invalid ID
     response = client.delete("/delete_user", params={"user_id": 999}, headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -847,10 +848,10 @@ def test_delete_user_invalid_id(admin_token, mocker, valid_admin_user):
 
 def test_create_optional_extra_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate optional_extra_id 3 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate optional_extra_id 3 being created
 
     # Send a request to create a new optional extra
     new_optional_extra_data = {
@@ -870,9 +871,9 @@ def test_create_optional_extra_valid_admin(admin_token, mocker, valid_admin_user
 def test_create_optional_extra_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate optional_extra_id 3 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate optional_extra_id 3 being created
     # Send a request to create a new optional extra
     new_optional_extra_data = {
         "extra_id": 0,
@@ -887,9 +888,9 @@ def test_create_optional_extra_valid_non_admin(non_admin_token, mocker, valid_no
 def test_create_optional_extra_invalid_data(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate optional_extra_id 3 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=3)  # Simulate optional_extra_id 3 being created
     # Send a request to create a new optional extra with invalid data
     new_optional_extra_data = {
         "extra_id": 0,
@@ -903,10 +904,10 @@ def test_create_optional_extra_invalid_data(admin_token, mocker, valid_admin_use
 def test_create_optional_extra_duplicate(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database insert operation to raise a unique constraint error
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.CONFLICT, message=Messages.DUPLICATION_ERROR, data=None)))
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.CONFLICT, message=Messages.DUPLICATION_ERROR, data=None)))
     # Send a request to create a new optional extra
     new_optional_extra_data = {
         "extra_id": 0,
@@ -921,9 +922,9 @@ def test_create_optional_extra_duplicate(admin_token, mocker, valid_admin_user):
 def test_create_optional_extra_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database insert operation to raise a generic database error
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
     # Send a request to create a new optional extra
     new_optional_extra_data = {
         "extra_id": 0,
@@ -937,10 +938,10 @@ def test_create_optional_extra_database_error(admin_token, mocker, valid_admin_u
 
 def test_read_optional_extra_list_all(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database query for listing all optional extras
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"extra_id": 1, "name": "Extra1", "code": "EXTRA1", "price": 10.0},
         {"extra_id": 2, "name": "Extra2", "code": "EXTRA2", "price": 20.0}
     ])
@@ -957,9 +958,9 @@ def test_read_optional_extra_list_all(admin_token, mocker, valid_admin_user):
 
 def test_read_optional_extra_by_id(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database query for retrieving an optional extra by ID
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", return_value=[
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", return_value=[
         {"extra_id": 1, "name": "Extra1", "code": "EXTRA1", "price": 10.0}
     ])
     # Send a request to retrieve an optional extra by ID
@@ -987,9 +988,9 @@ def test_read_optional_extra_by_id_missing_extra_id(admin_token):
 def test_update_optional_extra_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Send a request to update an optional extra
     updated_optional_extra_data = {
         "extra_id": 1,
@@ -1009,9 +1010,9 @@ def test_update_optional_extra_valid_admin(admin_token, mocker, valid_admin_user
 def test_update_optional_extra_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Send a request to update an optional extra
     updated_optional_extra_data = {
         "extra_id": 1,
@@ -1026,9 +1027,9 @@ def test_update_optional_extra_valid_non_admin(non_admin_token, mocker, valid_no
 def test_update_optional_extra_invalid_data(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Send a request to update an optional extra with invalid data
     updated_optional_extra_data = {
         "extra_id": 1,
@@ -1042,9 +1043,9 @@ def test_update_optional_extra_invalid_data(admin_token, mocker, valid_admin_use
 def test_update_optional_extra_invalid_id(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database update operation to raise an exception
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.OPTIONAL_EXTRA_NOT_FOUND, data=None)))
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.OPTIONAL_EXTRA_NOT_FOUND, data=None)))
     # Send a request to update an optional extra with an invalid ID
     updated_optional_extra_data = {
         "extra_id": 999,
@@ -1059,9 +1060,9 @@ def test_update_optional_extra_invalid_id(admin_token, mocker, valid_admin_user)
 def test_update_optional_extra_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database update operation to raise an exception
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
     # Send a request to update an optional extra
     updated_optional_extra_data = {
         "extra_id": 1,
@@ -1081,9 +1082,9 @@ def test_update_optional_extra_missing_extra(admin_token):
 def test_delete_optional_extra_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database delete operation
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", return_value=None)
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", return_value=None)
     # Send a request to delete an optional extra
     response = client.delete("/delete_optional_extra", params={"extra_id": 1}, headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == HTTPStatus.OK
@@ -1094,9 +1095,9 @@ def test_delete_optional_extra_valid_admin(admin_token, mocker, valid_admin_user
 def test_delete_optional_extra_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database delete operation
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", return_value=None)
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", return_value=None)
     # Send a request to delete an optional extra
     response = client.delete("/delete_optional_extra", params={"extra_id": 1}, headers={"Authorization": f"Bearer {non_admin_token}"})
     assert response.status_code == HTTPStatus.FORBIDDEN
@@ -1105,9 +1106,9 @@ def test_delete_optional_extra_valid_non_admin(non_admin_token, mocker, valid_no
 def test_delete_optional_extra_invalid_id(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database delete operation to raise an exception
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.OPTIONAL_EXTRA_NOT_FOUND, data=None)))
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.NOT_FOUND, message=Messages.OPTIONAL_EXTRA_NOT_FOUND, data=None)))
     # Send a request to delete an optional extra with an invalid ID
     response = client.delete("/delete_optional_extra", params={"extra_id": 999}, headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == HTTPStatus.NOT_FOUND
@@ -1116,9 +1117,9 @@ def test_delete_optional_extra_invalid_id(admin_token, mocker, valid_admin_user)
 def test_delete_optional_extra_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database delete operation to raise an exception
-    mocker.patch("app.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.DeleteStatementExecutor.execute_delete", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
     # Send a request to delete an optional extra
     response = client.delete("/delete_optional_extra", params={"extra_id": 1}, headers={"Authorization": f"Bearer {admin_token}"})
     assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
@@ -1132,11 +1133,11 @@ def test_delete_optional_extra_missing_extra_id(admin_token):
 def test_create_car_insurance_policy_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
     # Mock the database insert operation for optional extras
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
     # Send a request to create a car insurance policy
     policy_data = {
         "user_id": 1,
@@ -1177,11 +1178,11 @@ def test_create_car_insurance_policy_valid_admin(admin_token, mocker, valid_admi
 def test_create_car_insurance_policy_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
     # Mock the database insert operation for optional extras
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
     # Send a request to create a car insurance policy for their own user_id
     start_date, end_date = get_policy_dates()
     policy_data = {
@@ -1226,11 +1227,11 @@ def test_create_car_insurance_policy_valid_non_admin(non_admin_token, mocker, va
 def test_create_car_insurance_policy_valid_non_admin_forbidden(non_admin_token, mocker, valid_non_admin_user):
     # Mock the User class to simulate
     # the requesting non-admin user
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
     # Mock the database insert operation for optional extras
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
     # Send a request to create a car insurance policy for another user
     start_date, end_date = get_policy_dates()
     policy_data = {
@@ -1258,11 +1259,11 @@ def test_create_car_insurance_policy_valid_non_admin_forbidden(non_admin_token, 
 def test_create_car_insurance_policy_invalid_data(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
     # Mock the database insert operation for optional extras
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
     # Send a request to create a car insurance policy with invalid data
     policy_data = {
         "user_id": 1,
@@ -1288,10 +1289,10 @@ def test_create_car_insurance_policy_invalid_data(admin_token, mocker, valid_adm
 def test_create_car_insurance_policy_duplicate(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
 
     # Mock the database insert operation to raise a unique constraint error
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.CONFLICT, message=Messages.DUPLICATION_ERROR, data=None)))
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.CONFLICT, message=Messages.DUPLICATION_ERROR, data=None)))
     # Send a request to create a car insurance policy
     start_date, end_date = get_policy_dates()
     policy_data = {
@@ -1319,11 +1320,11 @@ def test_create_car_insurance_policy_duplicate(admin_token, mocker, valid_admin_
 def test_create_car_insurance_policy_invalid_optional_extras(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database insert operation
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", return_value=101)  # Simulate policy ID 101 being created
     # Mock the database insert operation for optional extras
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert_many", return_value=None)
     # Send a request to create a car insurance policy with invalid optional extras
     start_date, end_date = get_policy_dates()
     policy_data = {
@@ -1352,9 +1353,9 @@ def test_create_car_insurance_policy_invalid_optional_extras(admin_token, mocker
 def test_create_car_insurance_policy_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database insert operation to raise an exception
-    mocker.patch("app.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.InsertStatementExecutor.execute_insert", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
     # Send a request to create a car insurance policy
     start_date, end_date = get_policy_dates()
     policy_data = {
@@ -1436,7 +1437,7 @@ def test_read_car_insurance_policy_non_admin_forbidden(non_admin_token, mocker, 
     # the requesting non-admin user
     #check admin should throw value error which becomes 403 httpexception
     # dosent get to quering db
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     response = client.get("/read_car_insurance_policy", params={"mode": "list_all"}, headers={"Authorization": f"Bearer {non_admin_token}"}
     )
     assert response.status_code == HTTPStatus.FORBIDDEN
@@ -1445,9 +1446,9 @@ def test_read_car_insurance_policy_non_admin_forbidden(non_admin_token, mocker, 
 def test_read_car_insurance_policy_database_error(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate
     # the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock the database query operation to raise an exception
-    mocker.patch("app.statements.SelectStatementExecutor.execute_select", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
+    mocker.patch("app.utils.statements.SelectStatementExecutor.execute_select", side_effect=ValueError(APIResponse(status=HTTPStatus.INTERNAL_SERVER_ERROR, message=Messages.DB_ERROR, data=None)))
     # Send a request to read car insurance policies
     response = client.get("/read_car_insurance_policy", params={"mode": "list_all"}, headers={"Authorization": f"Bearer {admin_token}"}
     )
@@ -1456,12 +1457,12 @@ def test_read_car_insurance_policy_database_error(admin_token, mocker, valid_adm
 
 def test_update_car_insurance_policy_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock user lookup and permission check
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     # Mock the database update operation
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     # Mock the CarInsurancePolicyService
     mocker.patch("app.services.car_insurance_policy_service.CarInsurancePolicyService.update_car_insurance_policy", return_value=None)
 
@@ -1491,10 +1492,10 @@ def test_update_car_insurance_policy_valid_admin(admin_token, mocker, valid_admi
     assert data["optional_extras"][0]["name"] == "Roadside Assistance"
 
 def test_update_car_insurance_policy_valid_non_admin(non_admin_token, mocker, valid_non_admin_user):
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_non_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
-    mocker.patch("app.statements.UpdateStatementExecutor.execute_update", return_value=None)
+    mocker.patch("app.utils.statements.UpdateStatementExecutor.execute_update", return_value=None)
     mocker.patch("app.services.car_insurance_policy_service.CarInsurancePolicyService.update_car_insurance_policy", return_value=None)
 
     policy_data = {
@@ -1519,7 +1520,7 @@ def test_update_car_insurance_policy_valid_non_admin(non_admin_token, mocker, va
     assert data["policy"]["policy_number"] == "POL67890"
 
 def test_update_car_insurance_policy_forbidden(non_admin_token, mocker, valid_non_admin_user):
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_non_admin_user)
     # Simulate permission denied
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=False)
@@ -1542,7 +1543,7 @@ def test_update_car_insurance_policy_forbidden(non_admin_token, mocker, valid_no
     assert response.status_code == HTTPStatus.FORBIDDEN
 
 def test_update_car_insurance_policy_invalid_data(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     # Invalid because policy_number contains a space
@@ -1565,7 +1566,7 @@ def test_update_car_insurance_policy_invalid_data(admin_token, mocker, valid_adm
     assert response.status_code == HTTPStatus.BAD_REQUEST
 
 def test_update_car_insurance_policy_database_error(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_update_permissions", return_value=True)
     # Simulate DB error
@@ -1599,7 +1600,7 @@ def test_update_car_insurance_policy_missing_policy(admin_token):
 
 def test_delete_car_insurance_policy_valid_admin(admin_token, mocker, valid_admin_user):
     # Mock the User class to simulate the requesting admin user
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     # Mock user lookup and admin check
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_admin", return_value=True)
@@ -1618,7 +1619,7 @@ def test_delete_car_insurance_policy_valid_admin(admin_token, mocker, valid_admi
     assert data["policy_id"] == 1
 
 def test_delete_car_insurance_policy_non_admin_forbidden(non_admin_token, mocker, valid_non_admin_user):
-    mocker.patch("app.main.User", return_value=valid_non_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_non_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_non_admin_user)
     # Simulate admin check raising ValueError (forbidden)
     mocker.patch("app.services.user_service.UserService.check_admin", side_effect=ValueError(APIResponse(status=HTTPStatus.FORBIDDEN, message=Messages.USER_NO_PERMISSION, data=None)))
@@ -1631,7 +1632,7 @@ def test_delete_car_insurance_policy_non_admin_forbidden(non_admin_token, mocker
     assert response.json() == {"detail": Messages.USER_NO_PERMISSION}
 
 def test_delete_car_insurance_policy_not_found(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_admin", return_value=True)
     # Simulate policy not found
@@ -1645,7 +1646,7 @@ def test_delete_car_insurance_policy_not_found(admin_token, mocker, valid_admin_
     assert response.json() == {"detail": Messages.POLICY_NOT_FOUND}
 
 def test_delete_car_insurance_policy_database_error(admin_token, mocker, valid_admin_user):
-    mocker.patch("app.main.User", return_value=valid_admin_user)
+    mocker.patch("app.models.user.User", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.get_user_by_id", return_value=valid_admin_user)
     mocker.patch("app.services.user_service.UserService.check_admin", return_value=True)
     mocker.patch("app.services.car_insurance_policy_service.CarInsurancePolicyService.check_car_insurance_policy_exists", return_value=None)

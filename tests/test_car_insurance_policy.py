@@ -1,5 +1,5 @@
 import pytest
-from app.car_insurance_policy import CarInsurancePolicy
+from app.models.car_insurance_policy import CarInsurancePolicy
 
 @pytest.fixture
 def valid_policy_data():

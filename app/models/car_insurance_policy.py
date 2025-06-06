@@ -3,9 +3,9 @@ from typing import Optional
 from http import HTTPStatus
 import re
 
-from .response import APIResponse
-from .messages import Messages
-from .field_formatting import capitalise_first
+from app.utils.response import APIResponse
+from app.utils.messages import Messages
+from app.utils.field_formatting import capitalise_first
 
 class CarInsurancePolicy(BaseModel):
     ci_policy_id: Optional[int] = Field(None, alias='ci_policy_id')
