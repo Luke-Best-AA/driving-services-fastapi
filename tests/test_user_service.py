@@ -1,7 +1,7 @@
 import pytest
 from app.services.user_service import UserService
-from app.user import User
-from app.messages import Messages
+from app.models.user import User
+from app.utils.messages import Messages
 
 @pytest.fixture
 def mock_cursor(mocker):

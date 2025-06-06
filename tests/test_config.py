@@ -5,7 +5,7 @@ import pytest
 
 def reload_config(monkeypatch, env_vars):
     # Clear config from sys.modules to force reload
-    sys.modules.pop("app.config", None)
+    sys.modules.pop("app.utils.config", None)
     # Set environment variables
     for k, v in env_vars.items():
         monkeypatch.setenv(k, v)
@@ -14,7 +14,7 @@ def reload_config(monkeypatch, env_vars):
         if k not in env_vars:
             monkeypatch.delenv(k, raising=False)
     # Reload config
-    config = importlib.import_module("app.config")
+    config = importlib.import_module("app.utils.config")
     return config
 
 def test_config_prod(monkeypatch):

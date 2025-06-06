@@ -1,5 +1,5 @@
 import pytest
-from app.db_connect import DBConnect, DatabaseConnectionError
+from app.utils.db_connect import DBConnect, DatabaseConnectionError
 import pyodbc
 
 @pytest.fixture

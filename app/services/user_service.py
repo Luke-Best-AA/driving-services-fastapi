@@ -1,9 +1,9 @@
 from http import HTTPStatus
-from ..statements import InsertStatementExecutor, UpdateStatementExecutor, DeleteStatementExecutor, SelectStatementExecutor
-from ..response import APIResponse
-from ..user import User
-from ..debug import Debug  # Import the Debug class
-from ..messages import Messages  # Import the Messages class
+from app.utils.statements import InsertStatementExecutor, UpdateStatementExecutor, DeleteStatementExecutor, SelectStatementExecutor
+from app.utils.response import APIResponse
+from app.models.user import User
+from app.utils.debug import Debug  # Import the Debug class
+from app.utils.messages import Messages  # Import the Messages class
 
 class UserService:
     def __init__(self, cursor):
