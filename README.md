@@ -1,10 +1,23 @@
 # Driving Services FastAPI
 
-A modern web application for managing driving-related services, built with FastAPI, Jinja2, and a modular Python backend. This project demonstrates best practices in API design, frontend-backend integration, and clean code architecture.
+A modern web application for managing driving-related services, in particluar car insurance policies, built with FastAPI, Jinja2, and a modular Python backend. This project demonstrates best practices in API design, frontend-backend integration, and clean code architecture.
 
 ---
 
-## 🚀 Live Demo & API Documentation
+## 📑 Table of Contents
+- [🚀 Live Application & API Documentation](#-live-demo--api-documentation)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [✨ Features](#-features)
+- [📚 API Endpoints](#-api-endpoints)
+- [🏁 Running the Application Locally](#-running-the-application-locally)
+- [🧑‍💻 Coding Techniques & Best Practices](#-coding-techniques--best-practices)
+- [🧪 Testing](#-testing)
+- [📁 Folder Structure](#-folder-structure)
+- [📖 User Manual](#-user-manual)
+
+---
+
+## 🚀 Live Application & API Documentation
 
 - **Production API Docs:** [https://driving-services-fastapi.onrender.com/docs](https://driving-services-fastapi.onrender.com/docs)
 - The above link provides interactive Swagger UI for all available API endpoints.
@@ -24,44 +37,46 @@ A modern web application for managing driving-related services, built with FastA
 ## ✨ Features
 
 ### Backend (API)
-- User authentication and profile management
-- Car insurance policy management
-- Optional extras for insurance policies
+- User authentication (JWT) and profile management
+- Car insurance policy management (CRUD)
+- Optional extras for insurance policies (CRUD)
 - Modular service and data access layers
 - Error handling and response standardisation
+- Admin-only endpoints for sensitive operations
 
 ### Frontend
 - Responsive user dashboard (profile, details, password change)
 - Dynamic forms and validation
 - Clean, modern UI with custom CSS
-- Comprehensive dashboard for admin users
+- Comprehensive admin dashboard
 - Manage users, policies, and optional extras
 - Perform CRUD operations on all entities
 - Access to admin-only features
 
 ---
 
-## 📚 API Endpoints (Sample)
+## 📚 API Endpoints
 
-| Method | Endpoint                       | Description                                 |
-|--------|---------------------------------|---------------------------------------------|
-| POST   | `/token`                       | Obtain JWT access and refresh tokens        |
-| POST   | `/refresh_token`                | Refresh JWT tokens                          |
-| POST   | `/create_user`                  | Create a new user (admin only)              |
-| GET    | `/read_user`                    | Read user(s) by mode/filter/id              |
-| PUT    | `/update_user`                  | Update user details                         |
-| PATCH  | `/update_user_password`         | Update user password                        |
-| DELETE | `/delete_user`                  | Delete a user (admin only)                  |
-| POST   | `/create_optional_extra`        | Create an optional extra (admin only)       |
-| GET    | `/read_optional_extra`          | Read optional extras                        |
-| PUT    | `/update_optional_extra`        | Update an optional extra (admin only)       |
-| DELETE | `/delete_optional_extra`        | Delete an optional extra (admin only)       |
-| POST   | `/create_car_insurance_policy`  | Create a car insurance policy               |
-| GET    | `/read_car_insurance_policy`    | Read car insurance policies                 |
-| PUT    | `/update_car_insurance_policy`  | Update a car insurance policy               |
-| DELETE | `/delete_car_insurance_policy`  | Delete a car insurance policy (admin only)  |
-| GET    | `/healthcheck`                  | Health check endpoint                       |
-| ...    | ...                             | ...                                         |
+| Method | Endpoint                        | Description & Modes                                 |
+|--------|----------------------------------|-----------------------------------------------------|
+| POST   | `/token`                        | Obtain JWT access and refresh tokens                |
+| POST   | `/refresh_token`                 | Refresh JWT tokens                                  |
+| POST   | `/verify_authentication`         | Verify current JWT token                            |
+| POST   | `/create_user`                   | Create a new user (admin only)                      |
+| GET    | `/read_user`                     | Read users: `mode=list_all`, `mode=filter`, `mode=by_id`, `mode=myself` |
+| PUT    | `/update_user`                   | Update user details (admin or self)                 |
+| PATCH  | `/update_user_password`          | Update user password (admin override or self)       |
+| DELETE | `/delete_user`                   | Delete a user (admin only)                          |
+| POST   | `/register_user`                 | Register a new user (public)                        |
+| POST   | `/create_optional_extra`         | Create an optional extra (admin only)               |
+| GET    | `/read_optional_extra`           | Read optional extras: `mode=list_all`, `mode=by_id` |
+| PUT    | `/update_optional_extra`         | Update an optional extra (admin only)               |
+| DELETE | `/delete_optional_extra`         | Delete an optional extra (admin only)               |
+| POST   | `/create_car_insurance_policy`   | Create a car insurance policy (admin or self)       |
+| GET    | `/read_car_insurance_policy`     | Read policies: `mode=list_all`, `mode=by_id`, `mode=myself`, `mode=filter` |
+| PUT    | `/update_car_insurance_policy`   | Update a car insurance policy (admin or self)       |
+| DELETE | `/delete_car_insurance_policy`   | Delete a car insurance policy (admin only)          |
+| GET    | `/healthcheck`                   | Health check endpoint                               |
 
 See [API Docs](https://driving-services-fastapi.onrender.com/docs) for the full list and interactive testing.
 
@@ -249,20 +264,74 @@ pytest
 
 ---
 
-## 📁 Folder Structure (Key Files)
+## 📁 Folder Structure
 
 ```
 ├── app/
+│   ├── __init__.py
 │   ├── main.py                # FastAPI app entrypoint
-│   ├── user.py                # User models & logic
-│   ├── car_insurance_policy.py# Policy models & logic
-│   ├── templates/             # Jinja2 HTML templates
-│   └── static/                # CSS, JS, images
+│   ├── controllers/           # API route controllers
+│   ├── models/                # Pydantic models
+│   ├── services/              # Business logic/services
+│   ├── utils/                 # Utility modules (db, config, etc)
+│   ├── static/                # CSS, JS, images
+│   └── templates/             # Jinja2 HTML templates
 ├── tests/                     # Unit tests
 ├── requirements.txt           # Python dependencies
 ├── Dockerfile                 # Containerisation
 ├── run.py                     # Detects environment from .env and runs application
 └── README.md                  # Project documentation
 ```
+
+---
+
+## 📖 User Manual
+
+### Overview
+This application provides a full-featured driving services management system for both regular users and administrators. All features are accessible via a modern web UI and a documented REST API.
+
+### User Features
+- **Register/Login:**
+  - Register as a new user or log in with your credentials. JWT tokens are used for secure authentication.
+- **Profile Management:**
+  - View and update your profile details (username, email).
+  - Change your password securely from the profile page.
+- **Car Insurance Policies:**
+  - View a list of your car insurance policies.
+  - Create a new policy with start/end dates, VRN, make, model, coverage, and optional extras.
+  - Update your own policies.
+  - See all optional extras available and select them when creating or updating a policy.
+- **Session Management:**
+  - Automatic session expiration and refresh. You will be prompted to log in again if your session expires.
+
+### Admin Features
+- **Admin Dashboard:**
+  - Access a dedicated admin dashboard with advanced controls.
+- **User Management:**
+  - Create, read, update, and delete any user.
+  - Filter users by username, email, or admin status.
+  - Reset user passwords (admin override).
+- **Policy Management:**
+  - Create, read, update, and delete any car insurance policy.
+  - Filter policies by policy number, VRN, make, or model.
+  - Assign optional extras to any policy.
+- **Optional Extras Management:**
+  - Create, read, update, and delete optional extras.
+  - Assign extras to policies and manage their pricing.
+- **Table Sorting & Filtering:**
+  - All admin tables are sortable in ascending and decending order and users and policies are filterable for efficient management.
+
+### Walkthrough
+1. **Login/Register:**
+   - Go to the home page ( / ) and log in or register. Admins will see a link to the admin dashboard.
+2. **User Dashboard:**
+   - View your profile and all your car insurance policies. Add and update policies as needed.
+   - Use the profile page to update your details or change your password.
+3. **Admin Dashboard:**
+   - Use the sidebar to manage users, policies, and optional extras.
+   - Each section allows you to create new records, copy existing ones, filter/search, and perform updates or deletions.
+   - All actions provide immediate feedback and error messages.
+4. **Session Handling:**
+   - If your session expires, you will be prompted to log in again. All actions are protected by JWT authentication.
 
 ---
