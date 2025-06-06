@@ -1,16 +1,15 @@
-from fastapi import HTTPException
 from http import HTTPStatus
 
-from ..optional_extra import OptionalExtra
-from ..statements import SelectStatementExecutor, InsertStatementExecutor, DeleteStatementExecutor, UpdateStatementExecutor
-from ..debug import Debug
-from ..car_insurance_policy import CarInsurancePolicy
-from ..user import User
-from ..response import APIResponse
-from ..field_formatting import dates_to_string
-from ..messages import Messages
-from ..services.user_service import UserService
-from ..services.optional_extra_service import OptionalExtraService
+from app.models.optional_extra import OptionalExtra
+from app.utils.statements import SelectStatementExecutor, InsertStatementExecutor, DeleteStatementExecutor, UpdateStatementExecutor
+from app.utils.debug import Debug
+from app.models.car_insurance_policy import CarInsurancePolicy
+from app.models.user import User
+from app.utils.response import APIResponse
+from app.utils.field_formatting import dates_to_string
+from app.utils.messages import Messages
+from app.services.user_service import UserService
+from app.services.optional_extra_service import OptionalExtraService
 
 class CarInsurancePolicyService:
     def __init__(self, cursor, user: User, policy: CarInsurancePolicy, optional_extras: list[OptionalExtra] = None, can_update: bool = False):

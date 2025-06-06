@@ -1,5 +1,5 @@
 import pytest
-from app.optional_extra import OptionalExtra
+from app.models.optional_extra import OptionalExtra
 
 @pytest.fixture
 def valid_optional_extra_data():

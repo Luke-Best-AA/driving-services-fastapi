@@ -1,10 +1,11 @@
 from pydantic import BaseModel, Field, ConfigDict
 
 from typing import Optional
-from .debug import Debug  # Import the Debug class
-from .messages import Messages  # Import the Messages class
 from http import HTTPStatus
-from .response import APIResponse  # Import the APIResponse class
+
+from app.utils.debug import Debug  # Import the Debug class
+from app.utils.messages import Messages  # Import the Messages class
+from app.utils.response import APIResponse  # Import the APIResponse class
 
 import re
 

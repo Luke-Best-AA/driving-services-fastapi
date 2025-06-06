@@ -1,10 +1,9 @@
-from fastapi import HTTPException
 from http import HTTPStatus
 
-from ..statements import InsertStatementExecutor, UpdateStatementExecutor, DeleteStatementExecutor, SelectStatementExecutor
-from ..response import APIResponse
-from ..optional_extra import OptionalExtra
-from ..messages import Messages
+from app.utils.statements import InsertStatementExecutor, UpdateStatementExecutor, DeleteStatementExecutor, SelectStatementExecutor
+from app.utils.response import APIResponse
+from app.models.optional_extra import OptionalExtra
+from app.utils.messages import Messages
 
 class OptionalExtraService:
     def __init__(self, cursor):

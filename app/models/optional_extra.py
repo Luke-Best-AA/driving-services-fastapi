@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from http import HTTPStatus
-from .response import APIResponse
-from .messages import Messages
+
+from app.utils.response import APIResponse
+from app.utils.messages import Messages
 
 class OptionalExtra(BaseModel):
     extra_id: Optional[int] = Field(None, alias='extra_id')

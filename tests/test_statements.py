@@ -1,12 +1,12 @@
 import pytest
-from app.statements import (
+from app.utils.statements import (
     SelectStatementExecutor,
     InsertStatementExecutor,
     UpdateStatementExecutor,
     DeleteStatementExecutor,
 )
-from app.messages import Messages
-from app.error_constants import TYPE_CONVERSION_ERROR, UNIQUE_KEY_CONSTRAINT
+from app.utils.messages import Messages
+from app.utils.error_constants import TYPE_CONVERSION_ERROR, UNIQUE_KEY_CONSTRAINT
 
 @pytest.fixture
 def mock_cursor(mocker):
