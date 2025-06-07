@@ -447,6 +447,7 @@ async function populateOptionalExtras(policy, optionalsList, disabled = false) {
     if (optionalsList) {
         optionalsList.innerHTML = 'Loading...';
         const allExtras = await window.fetchAllOptionalExtras();
+        let selectedExtras;
         if (!policy) {
             selectedExtras = [];
         }
@@ -468,7 +469,8 @@ async function populateOptionalExtras(policy, optionalsList, disabled = false) {
             checkbox.disabled = disabled; // Disable checkbox if form is read-only
 
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(' ' + extra.name));
+            // Show name and price
+            label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
             optionalsList.appendChild(label);
         });
     }

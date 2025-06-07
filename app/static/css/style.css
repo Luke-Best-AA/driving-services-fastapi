@@ -229,6 +229,7 @@ body {
         max-width: 100vw !important;
         max-height: 100vh !important;
         border-radius: 0 !important;
+        min-width: 0 !important;
     }
 
     #popup-content {
@@ -277,8 +278,8 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     z-index: 201; /* raised above overlay */
     display: none; /* Hidden by default */
-    width: 420px;
-    max-width: 90vw;
+    min-width: 300px;
+    max-width: 600px; /* Ensure this is set and not overridden by !important elsewhere */
     max-height: 90vh;
     overflow-y: auto;
     overflow-x: hidden; /* Prevent horizontal scrollbar on animation */
@@ -329,7 +330,7 @@ body {
 #popup-close {
     position: absolute;
     top: 25px;
-    right: 25px;
+    right: 20px;
     font-size: 2rem;
     color: #ffd700;
     background: none;
@@ -415,4 +416,16 @@ input[type="checkbox"]:disabled:hover {
     text-align: center;
     line-height: 17px;
     margin-top: 20px;
+}
+
+input[type="checkbox"]:hover {
+    border-color: #6366f1;
+    /* Remove box-shadow on hover */
+    box-shadow: none;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    /* Remove any box-shadow when checked */
+    box-shadow: none;
 }

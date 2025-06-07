@@ -524,6 +524,36 @@ async function setPopupInputValues(policy) {
     window.populateOptionalExtras(policy, optionalsList);
 }
 
+// Update populateOptionalExtras to show price next to name
+window.populateOptionalExtras = async function(policy, optionalsList, disabled = false) {
+    if (optionalsList) {
+        optionalsList.innerHTML = 'Loading...';
+        const allExtras = await window.fetchAllOptionalExtras();
+        let selectedExtras;
+        if (!policy) {
+            selectedExtras = [];
+        } else {
+            selectedExtras = Array.isArray(policy.optional_extras)
+                ? policy.optional_extras.map(e => e.extra_id)
+                : [];
+        }
+        optionalsList.innerHTML = '';
+        allExtras.forEach(extra => {
+            const label = document.createElement('label');
+            label.className = 'optional-extra-checkbox';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = extra.extra_id;
+            checkbox.name = 'optionals';
+            checkbox.checked = selectedExtras.includes(extra.extra_id);
+            checkbox.disabled = disabled;
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
+            optionalsList.appendChild(label);
+        });
+    }
+};
+
 function fillUserTemplate(templateHtml, user) {
     role = user.is_admin ? 'Admin' : 'User';
     return templateHtml

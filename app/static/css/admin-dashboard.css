@@ -485,7 +485,7 @@
 
 .output-form .optionals-list {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 8px;
     margin-bottom: 8px;
 }
@@ -530,4 +530,18 @@
 #update-user-pwd-details-card {
     width: 100%;
     max-width: 400px;
+}
+
+.optional-extra-checkbox {
+    min-width: 180px;
+    white-space: nowrap;
+    flex: 1 1 180px;
+}
+
+#update-policy-details-card .optional-extra-checkbox,
+#create-policy-details-card .optional-extra-checkbox {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
