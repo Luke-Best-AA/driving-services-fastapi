@@ -183,6 +183,53 @@ body {
     transform: translateY(-2px) scale(1.04);
 }
 
+/* Logout button styles for confirmation popup */
+.logout-btn {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 0 10px;
+    margin-top: 10px;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    display: inline-block;
+    min-width: 90px;
+    text-align: center;
+}
+
+#popup-body .logout-btn {
+    display: inline-block;
+}
+
+#popup-body .logout-btn#logout-yes-btn {
+    background: linear-gradient(90deg, #f87171 0%, #ef4444 100%); /* red */
+    color: #fff;
+}
+#popup-body .logout-btn#logout-yes-btn:hover {
+    background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#popup-body .logout-btn#logout-no-btn {
+    background: linear-gradient(90deg, #60a5fa 0%, #6366f1 100%); /* blue */
+    color: #fff;
+}
+#popup-body .logout-btn#logout-no-btn:hover {
+    background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+#popup-body div {
+    text-align: center;
+}
+
+#popup-body p {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
 /* Large laptop */
 @media (max-width: 1400px) {
     #main-content {
@@ -229,6 +276,7 @@ body {
         max-width: 100vw !important;
         max-height: 100vh !important;
         border-radius: 0 !important;
+        min-width: 0 !important;
     }
 
     #popup-content {
@@ -277,8 +325,8 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     z-index: 201; /* raised above overlay */
     display: none; /* Hidden by default */
-    width: 420px;
-    max-width: 90vw;
+    min-width: 300px;
+    max-width: 600px; /* Ensure this is set and not overridden by !important elsewhere */
     max-height: 90vh;
     overflow-y: auto;
     overflow-x: hidden; /* Prevent horizontal scrollbar on animation */
@@ -329,7 +377,7 @@ body {
 #popup-close {
     position: absolute;
     top: 25px;
-    right: 25px;
+    right: 20px;
     font-size: 2rem;
     color: #ffd700;
     background: none;
@@ -415,4 +463,16 @@ input[type="checkbox"]:disabled:hover {
     text-align: center;
     line-height: 17px;
     margin-top: 20px;
+}
+
+input[type="checkbox"]:hover {
+    border-color: #6366f1;
+    /* Remove box-shadow on hover */
+    box-shadow: none;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    /* Remove any box-shadow when checked */
+    box-shadow: none;
 }

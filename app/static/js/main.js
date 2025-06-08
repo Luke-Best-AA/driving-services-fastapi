@@ -5,15 +5,10 @@
     if (registerLink) {
         registerLink.addEventListener('click', function(e) {
             if (registerLink.innerText === 'Log Out') {
-                if (!confirm("Are you sure you want to log out?")) {
-                    e.preventDefault();
-                    return;
-                }
-                // Use session expired popup for logout
                 e.preventDefault();
-                window.showSessionExpiredPopup();
-            }
-            else {
+                // Show logout confirmation popup
+                showLogoutConfirmationPopup();
+            } else {
                 window.location.href = '/register';
             }
         });
@@ -80,6 +75,35 @@
                     adminLink.style.display = 'block';
                 } else {
                     adminLink.style.display = 'none';
+                }
+            }
+
+            // Time-dependent greeting logic
+            const greetingDiv = document.getElementById('greeting-message');
+            if (greetingDiv && user) {
+                let username = '';
+                try {
+                    username = JSON.parse(user).username || '';
+                } catch (e) {
+                    username = '';
+                }
+                if (username) {
+                    const now = new Date();
+                    const hour = now.getHours();
+                    let greeting = 'Hello';
+                    if (hour >= 5 && hour < 12) {
+                        greeting = 'Good morning';
+                    } else if (hour >= 12 && hour < 18) {
+                        greeting = 'Good afternoon';
+                    } else if (hour >= 18 && hour < 22) {
+                        greeting = 'Good evening';
+                    } else {
+                        greeting = 'Good night';
+                    }
+                    greetingDiv.textContent = `${greeting}, ${username}`;
+                    greetingDiv.style.display = 'block';
+                } else {
+                    greetingDiv.style.display = 'none';
                 }
             }
         } else {
@@ -418,6 +442,7 @@ async function populateOptionalExtras(policy, optionalsList, disabled = false) {
     if (optionalsList) {
         optionalsList.innerHTML = 'Loading...';
         const allExtras = await window.fetchAllOptionalExtras();
+        let selectedExtras;
         if (!policy) {
             selectedExtras = [];
         }
@@ -439,7 +464,8 @@ async function populateOptionalExtras(policy, optionalsList, disabled = false) {
             checkbox.disabled = disabled; // Disable checkbox if form is read-only
 
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(' ' + extra.name));
+            // Show name and price
+            label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
             optionalsList.appendChild(label);
         });
     }
@@ -524,6 +550,8 @@ function extractApiErrorMessage(error) {
 
 // Show session expired popup, clear storage, and redirect after dismiss
 function showSessionExpiredPopup() {
+    // Only show if not logging out
+    if (window._isLoggingOut) return;
     // Clear tokens and user info
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -539,12 +567,10 @@ function showSessionExpiredPopup() {
             if (template) {
                 popupBody.innerHTML = template.innerHTML;
             } else {
-                popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p>' +
-                    '<button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
+                popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p><button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
             }
         }
         window.openPopup();
-        // Add event listener for the button
         setTimeout(() => {
             const okBtn = document.getElementById('session-expired-ok-btn');
             if (okBtn) {
@@ -560,6 +586,41 @@ function showSessionExpiredPopup() {
         window.location.href = '/';
     }
 }
+
+// Add logout confirmation popup logic
+function showLogoutConfirmationPopup() {
+    const popupTitle = document.getElementById('popup-title');
+    const popupBody = document.getElementById('popup-body');
+    if (popupTitle) popupTitle.textContent = 'Confirm Logout';
+    if (popupBody) {
+        popupBody.innerHTML = `<p>Are you sure you want to log out?</p>
+            <div style='text-align:center;margin-top:1em;'>
+                <button id='logout-yes-btn' class='logout-btn'>Yes</button>
+                <button id='logout-no-btn' class='logout-btn'>No</button>
+            </div>`;
+    }
+    window.openPopup();
+    setTimeout(() => {
+        const yesBtn = document.getElementById('logout-yes-btn');
+        const noBtn = document.getElementById('logout-no-btn');
+        if (yesBtn) {
+            yesBtn.onclick = function() {
+                window._isLoggingOut = true; // Set flag before logout
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user');
+                window.closePopup();
+                window.location.href = '/';
+            };
+        }
+        if (noBtn) {
+            noBtn.onclick = function() {
+                window.closePopup();
+            };
+        }
+    }, 0);
+}
+window.showLogoutConfirmationPopup = showLogoutConfirmationPopup;
 
 // Export to window for global access to ensure availability
 window.refreshToken = refreshToken;

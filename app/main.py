@@ -1,17 +1,19 @@
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import RequestValidationError
 
-from .utils.debug import Debug
-
-from .utils.config import ENV
-from .utils.messages import Messages
-
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from dotenv import load_dotenv
 import os
 from http import HTTPStatus
+
+from .utils.debug import Debug
+from .utils.config import ENV
+from .utils.messages import Messages
+
 from app.controllers.user_controller import router as user_router
 from app.controllers.optional_extra_controller import router as optional_extra_router
 from app.controllers.car_insurance_policy_controller import router as car_insurance_policy_router
@@ -46,6 +48,18 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "message": Messages.INVALID_REQUEST_DATA,
             "errors": exc.errors(),
         },
+    )
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        accept = request.headers.get("accept", "")
+        if "text/html" in accept:
+            return RedirectResponse(url="/")
+    # fallback to default behavior
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
     )
 
 @app.get("/healthcheck")
