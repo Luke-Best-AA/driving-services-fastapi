@@ -5,15 +5,10 @@
     if (registerLink) {
         registerLink.addEventListener('click', function(e) {
             if (registerLink.innerText === 'Log Out') {
-                if (!confirm("Are you sure you want to log out?")) {
-                    e.preventDefault();
-                    return;
-                }
-                // Use session expired popup for logout
                 e.preventDefault();
-                window.showSessionExpiredPopup();
-            }
-            else {
+                // Show logout confirmation popup
+                showLogoutConfirmationPopup();
+            } else {
                 window.location.href = '/register';
             }
         });
@@ -555,6 +550,8 @@ function extractApiErrorMessage(error) {
 
 // Show session expired popup, clear storage, and redirect after dismiss
 function showSessionExpiredPopup() {
+    // Only show if not logging out
+    if (window._isLoggingOut) return;
     // Clear tokens and user info
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -570,12 +567,10 @@ function showSessionExpiredPopup() {
             if (template) {
                 popupBody.innerHTML = template.innerHTML;
             } else {
-                popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p>' +
-                    '<button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
+                popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p><button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
             }
         }
         window.openPopup();
-        // Add event listener for the button
         setTimeout(() => {
             const okBtn = document.getElementById('session-expired-ok-btn');
             if (okBtn) {
@@ -591,6 +586,41 @@ function showSessionExpiredPopup() {
         window.location.href = '/';
     }
 }
+
+// Add logout confirmation popup logic
+function showLogoutConfirmationPopup() {
+    const popupTitle = document.getElementById('popup-title');
+    const popupBody = document.getElementById('popup-body');
+    if (popupTitle) popupTitle.textContent = 'Confirm Logout';
+    if (popupBody) {
+        popupBody.innerHTML = `<p>Are you sure you want to log out?</p>
+            <div style='text-align:center;margin-top:1em;'>
+                <button id='logout-yes-btn' class='logout-btn'>Yes</button>
+                <button id='logout-no-btn' class='logout-btn'>No</button>
+            </div>`;
+    }
+    window.openPopup();
+    setTimeout(() => {
+        const yesBtn = document.getElementById('logout-yes-btn');
+        const noBtn = document.getElementById('logout-no-btn');
+        if (yesBtn) {
+            yesBtn.onclick = function() {
+                window._isLoggingOut = true; // Set flag before logout
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user');
+                window.closePopup();
+                window.location.href = '/';
+            };
+        }
+        if (noBtn) {
+            noBtn.onclick = function() {
+                window.closePopup();
+            };
+        }
+    }, 0);
+}
+window.showLogoutConfirmationPopup = showLogoutConfirmationPopup;
 
 // Export to window for global access to ensure availability
 window.refreshToken = refreshToken;
