@@ -1,21 +1,17 @@
+// Main shared JS for navigation, popups, API helpers, and global utilities
+// Handles nav bar logic, session management, popups, and exposes API functions globally
+// Used by all pages for consistent UI and backend communication
+//
 (async function() {
-    const registerLink = document.getElementById('register-link');
+    // Navigation bar and logout logic
+    const logoutLink = document.getElementById('logout-link');
     const adminLink = document.getElementById('admin-dashboard-link');
     const navBar = document.getElementById('main-nav');
-    if (registerLink) {
-        registerLink.addEventListener('click', function(e) {
-            if (registerLink.innerText === 'Log Out') {
-                if (!confirm("Are you sure you want to log out?")) {
-                    e.preventDefault();
-                    return;
-                }
-                // Use session expired popup for logout
-                e.preventDefault();
-                window.showSessionExpiredPopup();
-            }
-            else {
-                window.location.href = '/register';
-            }
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Show logout confirmation popup
+            showLogoutConfirmationPopup();
         });
     }
     const popupContainer = document.getElementById('popup-container');
@@ -67,94 +63,64 @@
         const accessToken = localStorage.getItem('access_token');
         const refreshToken = localStorage.getItem('refresh_token');
         const user = localStorage.getItem('user');
-
         // if these are set set loggedIn to true
         const loggedIn = accessToken && refreshToken && user;
-        // change register link to logout link
         if (loggedIn) {
-            registerLink.innerText = 'Log Out';
-
-            const isAdmin = user && JSON.parse(user).is_admin;
-            if (adminLink) {
-                if (isAdmin) {
-                    adminLink.style.display = 'block';
-                } else {
-                    adminLink.style.display = 'none';
-                }
-            }
+            if (navBar) navBar.style.display = '';
         } else {
-            window.location.href = '/';
+            if (navBar) navBar.style.display = 'none';
         }
 
-        // You can use these variables as needed
-        console.log('Access Token:', accessToken);
-        console.log('Refresh Token:', refreshToken);
-        console.log('User:', user);
-
-        // call verify token endpoint with the access token
-        await fetch('/verify_authentication', {
-            method: 'POST',
-            headers: {
-                "Authorization": `Bearer ${accessToken}`
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
+        const isAdmin = user && JSON.parse(user).is_admin;
+        if (adminLink) {
+            if (isAdmin) {
+                adminLink.style.display = 'block';
             } else {
-                // try to refresh the token
-                return fetch('/refresh_token', {
-                    method: 'POST',
-                    headers: {
-                        "Authorization": `Bearer ${refreshToken}`
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error('Token refresh failed');
-                    }
-                })
-                .then(data => {
-                    if (data) {
-                        console.log('Token refresh response:', data);
-                        localStorage.setItem('access_token', data.access_token);
-                        localStorage.setItem('refresh_token', data.refresh_token);
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                        // Optionally reload the page or retry the original request
-                        window.location.reload();
-                    }
-                });
+                adminLink.style.display = 'none';
             }
-        })
-        .then(data => {
-            if (data) {
-                console.log('Token verification response:', data);
-                // Handle the response as needed
-                // For example, you can redirect to the dashboard or show user info
+        }
+
+        // Time-dependent greeting logic
+        const greetingDiv = document.getElementById('greeting-message');
+        if (greetingDiv && user) {
+            let username = '';
+            try {
+                username = JSON.parse(user).username || '';
+            } catch (e) {
+                username = '';
             }
-        })
-        .catch(error => {
-            console.error('Error verifying token:', error);
-            // Show session expired popup on token verification error
-            window.showSessionExpiredPopup();
-        });
-    }
-    else {
+            if (username) {
+                const now = new Date();
+                const hour = now.getHours();
+                let greeting = 'Hello';
+                if (hour >= 5 && hour < 12) {
+                    greeting = 'Good morning';
+                } else if (hour >= 12 && hour < 18) {
+                    greeting = 'Good afternoon';
+                } else if (hour >= 18 && hour < 22) {
+                    greeting = 'Good evening';
+                } else {
+                    greeting = 'Good night';
+                }
+                greetingDiv.textContent = `${greeting}, ${username}`;
+                greetingDiv.style.display = 'block';
+            } else {
+                greetingDiv.style.display = 'none';
+            }
+        }
+    } else {
         // if local storage has access token, refresh token and user, redirect to /dashboard
         const accessToken = localStorage.getItem('access_token');
         const refreshToken = localStorage.getItem('refresh_token');
         const user = localStorage.getItem('user');
         if (accessToken && refreshToken && user) {
+            if (navBar) navBar.style.display = '';
             // redirect to /dashboard
             window.location.href = '/dashboard';
         }
         else {
+            if (navBar) navBar.style.display = 'none';
             registerLink.innerText = 'Register';
-            if (navBar) {
-                navBar.style.display = 'none';
-            }
         }
     }
 
@@ -183,7 +149,7 @@ function formatDate(dateString, reverse=false) {
     return dateString;
 }
 
-// Make token/user functions globally accessible
+// Token/user API helpers (refresh, get user, get policy, etc.)
 async function refreshToken() {
     const refreshToken = localStorage.getItem('refresh_token');
     const response = await fetch('/refresh_token', {
@@ -320,7 +286,7 @@ async function getCarInsuranceById(policyId) {
     return null;
 }
 
-// DRY helper for API calls with token refresh and error handling
+// DRY API handler for token refresh and error handling
 async function handleApiResponse({ url, method = 'GET', headers = {}, body = null, retry = true }) {
     const accessToken = localStorage.getItem('access_token');
     headers['Authorization'] = `Bearer ${accessToken}`;
@@ -373,7 +339,7 @@ async function handleApiResponse({ url, method = 'GET', headers = {}, body = nul
     return { success: false, status: response.status, message: 'Unknown error' };
 }
 
-// Refactored API functions using handleApiResponse
+// Refactored API functions for CRUD operations
 async function createCarInsurancePolicy(data) {
     return await handleApiResponse({
         url: '/create_car_insurance_policy',
@@ -413,11 +379,12 @@ async function createUser(data) {
     });
 }
 
-// Populate optional extras in the policy form
+// Populate optional extras in policy forms
 async function populateOptionalExtras(policy, optionalsList, disabled = false) {
     if (optionalsList) {
         optionalsList.innerHTML = 'Loading...';
         const allExtras = await window.fetchAllOptionalExtras();
+        let selectedExtras;
         if (!policy) {
             selectedExtras = [];
         }
@@ -439,7 +406,8 @@ async function populateOptionalExtras(policy, optionalsList, disabled = false) {
             checkbox.disabled = disabled; // Disable checkbox if form is read-only
 
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(' ' + extra.name));
+            // Show name and price
+            label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
             optionalsList.appendChild(label);
         });
     }
@@ -502,7 +470,7 @@ function dateToDatabaseFormat(date) {
     return year + "-" + month + "-" + day;
 }
 
-// Utility function to handle API errors and extract messages
+// Utility: extract API error messages
 function extractApiErrorMessage(error) {
     if (!error) return 'Unknown error.';
     if (typeof error === 'string') return error;
@@ -522,8 +490,10 @@ function extractApiErrorMessage(error) {
     return 'An error occurred.';
 }
 
-// Show session expired popup, clear storage, and redirect after dismiss
+// Show session expired popup and handle redirect
 function showSessionExpiredPopup() {
+    // Only show if not logging out
+    if (window._isLoggingOut) return;
     // Clear tokens and user info
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
@@ -532,19 +502,16 @@ function showSessionExpiredPopup() {
     if (window.openPopup && window.closePopup) {
         const popupTitle = document.getElementById('popup-title');
         const popupBody = document.getElementById('popup-body');
+        const popupClose = document.getElementById('popup-close');
         if (popupTitle) popupTitle.textContent = 'Session Expired';
         if (popupBody) {
-            // Use the template from base.html
-            const template = document.getElementById('session-expired-popup-template');
-            if (template) {
-                popupBody.innerHTML = template.innerHTML;
-            } else {
-                popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p>' +
-                    '<button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
-            }
+            popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p>' +
+                '<button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
+        }
+        if (popupClose) {
+            popupClose.style.display = 'none';
         }
         window.openPopup();
-        // Add event listener for the button
         setTimeout(() => {
             const okBtn = document.getElementById('session-expired-ok-btn');
             if (okBtn) {
@@ -555,13 +522,47 @@ function showSessionExpiredPopup() {
             }
         }, 0);
     } else {
-        // Fallback: alert and redirect
-        alert('Your session has expired. Please log in again.');
         window.location.href = '/';
     }
 }
 
-// Export to window for global access to ensure availability
+// Show logout confirmation popup
+function showLogoutConfirmationPopup() {
+    const popupTitle = document.getElementById('popup-title');
+    const popupBody = document.getElementById('popup-body');
+    if (popupTitle) popupTitle.textContent = 'Confirm Logout';
+    if (popupBody) {
+        popupBody.innerHTML = `<p>Are you sure you want to log out?</p>
+            <div style='text-align:center;margin-top:1em;'>
+                <button id='logout-yes-btn' class='logout-btn'>Yes</button>
+                <button id='logout-no-btn' class='logout-btn'>No</button>
+            </div>`;
+    }
+    window.openPopup();
+    setTimeout(() => {
+        const yesBtn = document.getElementById('logout-yes-btn');
+        const noBtn = document.getElementById('logout-no-btn');
+        if (yesBtn) {
+            yesBtn.onclick = function() {
+                window._isLoggingOut = true; // Set flag before logout
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                localStorage.removeItem('user');
+                window.closePopup();
+                window.location.href = '/';
+            };
+        }
+        if (noBtn) {
+            noBtn.onclick = function() {
+                window.closePopup();
+            };
+        }
+    }, 0);
+}
+window.showLogoutConfirmationPopup = showLogoutConfirmationPopup;
+
+// Export all helpers and API functions to window for global access
+// Ensure availability of functions across different parts of the application
 window.refreshToken = refreshToken;
 window.getUserById = getUserById;
 window.getUserByMyself = getUserByMyself;

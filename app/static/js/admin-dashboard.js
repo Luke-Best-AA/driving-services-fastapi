@@ -1,4 +1,12 @@
+// Admin dashboard main script
+// Handles admin authentication, UI logic for user, policy, and optional extra management
+// Adds event listeners for all admin dashboard buttons and forms
+// Controls showing/hiding of cards, error/success messages, and form population
+// Uses localStorage/sessionStorage for session and popup management
+// Relies on window.* API functions for backend communication
+//
 window.addEventListener('DOMContentLoaded', async () => {
+    // Main content and user authentication
     const mainContent = document.getElementById('main-content');
     const user = JSON.parse(localStorage.getItem('user'));
     const userId = user.user_id;
@@ -1101,7 +1109,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             if (createExtraId.value) {
                 const extraId = createExtraId.value;
                 getOptionalExtraById(extraId).then(response => {
-                    if (response) {
+                    if (response.success) {
                         const extra = response.data.optional_extras[0];
                         // Populate the form with extra details
                         createExtraForm.querySelector('.extra-id').value = 0;
@@ -1190,7 +1198,7 @@ window.addEventListener('DOMContentLoaded', async () => {
                 const extraId = readExtraId.value;
                 if (extraId) {
                     getOptionalExtraById(extraId).then(response => {
-                        if (response) {
+                        if (response.success) {
                             const extra = response.data.optional_extras[0];
                             // Populate the form with extra details
                             readExtraDetailsCard.querySelector('.extra-id').value = extra.extra_id;
@@ -1267,7 +1275,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             const extraId = updateExtraId.value;
             if (extraId) {
                 getOptionalExtraById(extraId).then(response => {
-                    if (response) {
+                    if (response.success) {
                         const extra = response.data.optional_extras[0];
                         // Populate the form with extra details
                         const updateExtraDetailsCard = document.getElementById('update-extra-details-card');
@@ -1347,7 +1355,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             const extraId = deleteExtraId.value;
             if (extraId) {
                 getOptionalExtraById(extraId).then(response => {
-                    if (response) {
+                    if (response.success) {
                         const extra = response.data.optional_extras[0];
                         // Populate the form with extra details
                         deleteExtraForm.querySelector('.extra-id').value = extra.extra_id;

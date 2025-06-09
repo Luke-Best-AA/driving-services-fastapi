@@ -1,29 +1,37 @@
+/*
+  Profile Page Stylesheet
+  - Styles for user profile card, input forms, update/cancel buttons, and pagination controls
+*/
+
 #user-section {
-    /* Remove top border so tabs look connected */
+    /* Profile section border and spacing */
     border: 1.5px solid #2a5d9f;
     margin-top: -1.5px;
     padding: 25px;
 }
 
 #pagination-section {
+    /* Pagination section spacing */
     margin: 0;
     padding: 0;
 }
 
 .pagination-buttons {
+    /* Pagination button row layout */
     display: flex;
-    gap: 0; /* Remove gap between tab buttons */
+    gap: 0;
     justify-content: center;
-    /* Remove margin to connect tabs to section */
     margin-bottom: 0 !important;
 }
 
 #user-profile-detail{
+    /* Hide profile detail by default */
     display:none
 }
 
 /* User Profile Card Styles */
 #user-profile, #user-inputs {
+    /* Profile card and input form container */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,10 +47,12 @@
 }
 
 #user-profile:hover {
+    /* Hover effect for profile card */
     box-shadow: 0 8px 32px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
 }
 
 #user-profile h3 {
+    /* Profile name heading */
     font-size: 2rem;
     margin-bottom: 0.5rem;
     color: #2a5d9f;
@@ -50,12 +60,14 @@
 }
 
 #user-profile p {
+    /* Profile info text */
     margin: 0.5rem 0;
     font-size: 1.1rem;
     color: #444;
 }
 
 #profile-detail > div > h2 {
+    /* Profile detail section heading */
     text-align: center;
     font-size: 36.8px;
     color: #2a5d9f;
@@ -66,17 +78,18 @@
 }
 
 .input-group {
+    /* Input group layout */
     width: 100%;
     max-width: 100%;
     display: flex;
     flex-direction: column;
-    /* Prevent child overflow */
     box-sizing: border-box;
 }
 
 #user-inputs input[type="text"],
 #user-inputs input[type="email"],
 #user-inputs input[type="password"] {
+    /* Profile input fields */
     padding: 12.8px 19.2px;
     border: 1.5px solid #b6c6e3;
     border-radius: 12px;
@@ -91,6 +104,7 @@
 }
 
 #user-inputs input[readonly] {
+    /* Readonly input styling */
     background: #e9eef6;
     color: #888;
     border: 1.5px solid #b6c6e3;
@@ -99,6 +113,7 @@
 }
 
 .input-label {
+    /* Input label styling */
     font-size: 1rem;
     color: #2a5d9f;
     margin-bottom: 6px;
@@ -108,6 +123,7 @@
 }
 
 #update-profile-confirm-btn {
+    /* Confirm profile update button */
     background: linear-gradient(90deg, #2a5d9f 0%, #4a7fd8 100%);    
 }
 
@@ -116,6 +132,7 @@
 }
 
 #cancel-password-btn {
+    /* Cancel password change button */
     background: linear-gradient(90deg, #f87171 0%, #fca5a5 100%);
     margin-bottom: 10px;
 }
@@ -125,6 +142,7 @@
 }
 
 #update-password-btn {
+    /* Confirm password update button */
     background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
 }
 
@@ -133,6 +151,7 @@
 }
 
 .update-profile-btn {
+    /* Shared style for update/cancel buttons */
     color: #fff;
     padding: 12.8px 25.6px;
     border: none;
@@ -147,10 +166,12 @@
 }
 
 .update-profile-btn:hover {
+    /* Hover effect for update/cancel buttons */
     transform: scale(1.02);
 }
 
 @media (max-width: 600px) {
+    /* Responsive styles for small screens */
     #user-profile {
         padding: 1rem;
         max-width: 95vw;
@@ -163,11 +184,13 @@
 
 /* Pagination Buttons Styles */
 .pagination-buttons {
+    /* Pagination button row layout */
     display: flex;
     justify-content: center;
 }
 
 .pagination-buttons button {
+    /* Pagination button styling */
     background: #f4f6fa;
     border: 1.5px solid #b6c6e3;
     border-bottom: none;
@@ -186,6 +209,7 @@
 
 .pagination-buttons button.active,
 .pagination-buttons button:focus {
+    /* Active/selected pagination button */
     background: #fff;
     color: #1a3e6e;
     border-color: #2a5d9f;
@@ -203,6 +227,7 @@
 }
 
 #change-password-btn {
+    /* Change password button styling */
     background: linear-gradient(90deg, #eab308 0%, #fbbf24 100%);
     color: #fff;
     padding: 5px 7px;

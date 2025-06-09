@@ -1,17 +1,26 @@
+/*
+  Home/Login/Register Page Stylesheet
+  - Styles for main content, home header, login and register forms, responsive layout, and UI feedback
+*/
+
 #main-content {
+    /* Prevent content overflow */
     overflow: hidden;
 }
 
 #home-content {
+    /* Grid layout for home page: header and login side by side */
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-areas: "header login";
     gap: 40px;
     height: 100%;
     width: 100%;
+    padding-bottom: 30px;
 }
 
 #home-header {
+    /* Home header section styling */
     grid-area: header;
     display: flex;
     align-items: center;
@@ -19,6 +28,7 @@
 }
 
 #home-header h1 {
+    /* Main heading style */
     margin: 0 0 18px 0;
     font-size: 2.2rem;
     color: #333;
@@ -26,17 +36,20 @@
 }
 
 #home-header p {
+    /* Subheading/description style */
     margin: 10px 0;
     color: #555;
     font-size: 1.1rem;
 }
 
 #home-header ol {
+    /* Ordered list in header */
     margin-top: 20px;
     line-height: 35px;
 }
 
 #home-header ol li{
+    /* List item style */
     margin: 0;
     margin-left: 20px;
     padding: 0;
@@ -45,6 +58,7 @@
 }
 
 #login-section {
+    /* Login section grid area */
     grid-area: login;
     display: flex;
     justify-content: center;
@@ -52,6 +66,7 @@
 }
 
 #main-login-container {
+    /* Login form container styling */
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12);
@@ -59,15 +74,17 @@
 }
 
 #main-header-container {
+    /* Header container padding */
     padding: 50px 50px 0 50px;
 }
 
-/* Apply animation to all direct children of #main-content */
 #main-content > * {
+    /* Fade-in animation for all children */
     animation: fadeInUp 2.5s cubic-bezier(.23,1.01,.32,1) both;
 }
 
 @keyframes fadeInUp {
+    /* Animation for upward fade-in */
     from {
         opacity: 0;
         transform: translateY(40px);
@@ -79,11 +96,13 @@
 }
 
 @keyframes fadeIn {
+    /* Simple fade-in animation */
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
 #form-login {
+    /* Login form layout */
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -97,12 +116,14 @@
 #form-login input[type="text"],
 #form-login input[type="password"],
 #form-login button[type="submit"] {
+    /* Login form input/button width */
     width: 240px;
     box-sizing: border-box;
 }
 
 #form-login input[type="text"],
 #form-login input[type="password"] {
+    /* Login input fields */
     padding: 12px;
     border: 1px solid #bfc7d1;
     border-radius: 6px;
@@ -113,11 +134,13 @@
 
 #form-login input[type="text"]:focus,
 #form-login input[type="password"]:focus {
+    /* Focus state for login inputs */
     border: 1.5px solid #6366f1;
     box-shadow: 0 0 0 2px #a5b4fc44;
 }
 
 #form-login button[type="submit"] {
+    /* Login button styling */
     padding: 12px;
     background: linear-gradient(90deg, #6366f1 0%, #7b8dfb 100%);
     color: #fff;
@@ -131,11 +154,13 @@
 }
 
 #form-login button[type="submit"]:hover {
+    /* Hover state for login button */
     background: linear-gradient(90deg, #7b8dfb 0%, #6366f1 100%);
     transform: translateY(-2px) scale(1.01);
 }
 
 #form-login-error-msg {
+    /* Error message for login */
     color: #e11d48;
     margin-top: 10px;
     min-height: 20px;
@@ -145,11 +170,13 @@
 }
 
 .register-link-container {
+    /* Container for register link */
     margin-top: 18px;
     text-align: center;
 }
 
 #show-register-link {
+    /* Register link styling */
     color: #6366f1;
     text-decoration: underline;
     cursor: pointer;
@@ -161,6 +188,7 @@
 }
 
 #form-register {
+    /* Register form layout */
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -172,12 +200,14 @@
 #form-register input[type="text"],
 #form-register input[type="password"],
 #form-register button[type="submit"] {
+    /* Register form input/button width */
     width: 220px;
     box-sizing: border-box;
 }
 #form-register input[type="text"],
 #form-register input[type="password"],
 #form-register input[type="email"] {
+    /* Register input fields */
     padding: 10px;
     border: 1px solid #bfc7d1;
     border-radius: 6px;
@@ -188,10 +218,12 @@
 #form-register input[type="text"]:focus,
 #form-register input[type="password"]:focus,
 #form-register input[type="email"]:focus {
+    /* Focus state for register inputs */
     border: 1.5px solid #6366f1;
     box-shadow: 0 0 0 2px #a5b4fc44;
 }
 #form-register button[type="submit"] {
+    /* Register button styling */
     padding: 10px;
     background: linear-gradient(90deg, #6366f1 0%, #7b8dfb 100%);
     color: #fff;
@@ -208,6 +240,7 @@
     transform: translateY(-2px) scale(1.01);
 }
 #form-register-error-msg {
+    /* Error message for register */
     color: #e11d48;
     margin-top: 10px;
     min-height: 20px;
@@ -215,7 +248,9 @@
     text-align: center;
     display: block;
 }
+
 .register-success-msg {
+    /* Success message for registration */
     color: #16a34a;
     font-size: 1.1rem;
     text-align: center;
@@ -223,6 +258,7 @@
 }
 
 .register-admin-label {
+    /* Admin checkbox label styling */
     display: flex;
     align-items: center;
     background: #f3f4f6;
@@ -237,17 +273,17 @@
     gap: 8px;
 }
 #register-is-admin {
+    /* Admin checkbox input */
     accent-color: #6366f1;
     width: 18px;
     height: 18px;
     margin-right: 8px;
 }
 
-/* Responsive for tablet and below: stack header and login vertically */
 @media (max-width: 900px) {
+    /* Responsive layout for tablets/small screens */
     #home-content {
         grid-template-areas: "header header" "login login";
-        /* Reduce vertical gap between header and login section */
         gap: 10px;
     }
 
@@ -269,6 +305,6 @@
     }
 }
 
-/* Responsive for mobile */
 @media (max-width: 500px) {
+    /* Add mobile-specific styles here if needed */
 }
