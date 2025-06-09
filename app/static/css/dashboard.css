@@ -1,12 +1,19 @@
+/*
+  Dashboard Stylesheet
+  - Styles for car insurance policy dashboard, forms, tables, and admin-only controls (delete)
+*/
+
 #car-insurance-policy,
 #car-insurance-policy-detail,
 #car-insurance-policy-inputs,
 #user-profile-detail
 {
+    /* Hide sections by default */
     display: none;
 }
 
 .policy-card {
+    /* Card layout for displaying policy details */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,23 +27,35 @@
 }
 
 #car-insurance-policies {
+    /* Container for all policy cards */
     margin: 15px 0;
-}
-
-#policy-detail, #policy-inputs, #policy-create-details {
-    line-height: 40px;
 }
 
 .policy-table td:first-child,
 .policy-input-table td:first-child,
 .policy-list-table td:first-child {
+    /* Style for label cells in tables */
     font-weight: bold;
     color: #444;
-    width: 160px;
-    vertical-align: top; /* Add this line */
+    vertical-align: top;
+    text-align: right;
+    width: 120px;
+    min-width: 90px;
+}
+
+.policy-table td:last-child,
+.policy-input-table td:last-child,
+.policy-list-table td:last-child {
+    /* Style for value/input cells in tables */
+    padding-left: 18px;
+    color: #333;
+    text-align: left;
+    width: auto;
+    min-width: 160px;
 }
 
 #policy-inputs {
+    /* Policy input form layout */
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -44,6 +63,7 @@
 }
 
 #policy-inputs label {
+    /* Label styling for policy input fields */
     display: flex;
     align-items: center;
     gap: 10px;
@@ -54,6 +74,7 @@
 }
 
 #policy-inputs label span {
+    /* Label text for input fields */
     min-width: 110px;
     color: #444;
     font-weight: bold;
@@ -63,6 +84,7 @@
 #policy-inputs input[type="date"],
 #policy-create-details input[type="text"],
 #policy-create-details input[type="date"] {
+    /* Input fields for policy forms */
     padding: 8px 12px;
     border: 1px solid #d1d5db;
     border-radius: 5px;
@@ -79,11 +101,13 @@
 #policy-inputs input[type="date"]:focus,
 #policy-create-details input[type="text"]:focus,
 #policy-create-details input[type="date"]:focus {
+    /* Focus state for input fields */
     border-color: #6366f1;
     box-shadow: 0 0 0 2px #6366f133;
 }
 
-#policy-inputs .optionals-row {
+#policy-inputs {
+    /* Additional layout for policy inputs */
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
@@ -92,21 +116,22 @@
 }
 
 .optional-extra-checkbox {
+    /* Checkbox for optional extras */
     display: inline-flex;
     align-items: center;
-    margin-right: 14px;
-    margin-bottom: 6px;
     font-weight: 400;
-    font-size: 1rem;
+    font-size: 15px;
     color: #333;
     cursor: pointer;
     user-select: none;
+    line-height: 30px;
 }
 
 #policy-inputs button,
 #policy-form button,
 #update-policy-btn,
 #policy-create-form button {
+    /* Buttons for policy forms */
     width: 100%;
     padding: 12px 0;
     margin-top: 12px;
@@ -126,16 +151,19 @@
 #policy-form button:hover,
 #update-policy-btn:hover,
 #policy-create-form button:hover {
+    /* Hover state for buttons */
     background: linear-gradient(90deg, #60a5fa 0%, #6366f1 100%);
     transform: translateY(-2px) scale(1.03);
     box-shadow: 0 4px 16px rgba(99,102,241,0.12);
 }
 
 #add-new-policy {
+    /* Add new policy button alignment */
     text-align: right;
 }
 
 .policies-header-row {
+    /* Header row for policies section */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -144,6 +172,7 @@
 }
 
 #delete-policy-confirmation {
+    /* Delete confirmation dialog styling */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -151,15 +180,18 @@
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
 }
 
 #delete-policy-confirmation .delete-buttons-row {
+    /* Row for delete/cancel buttons */
     display: flex;
     width: 100%;
     gap: 0;
 }
 
 #confirm-delete-btn, #cancel-delete-btn {
+    /* Delete and cancel buttons */
     flex: 1 1 50%;
     border: none;
     padding: 12px 0;
@@ -172,6 +204,7 @@
 }
 
 #confirm-delete-btn {
+    /* Confirm delete button */
     background: linear-gradient(90deg, #ef4444 0%, #f59e42 100%);
     color: #fff;
     border-top-left-radius: 6px;
@@ -179,6 +212,7 @@
 }
 
 #cancel-delete-btn {
+    /* Cancel delete button */
     background: linear-gradient(90deg, #e5e7eb 0%, #d1d5db 100%);
     color: #333;
     border-top-right-radius: 6px;
@@ -194,26 +228,82 @@
 }
 
 body:not(.is-admin) .admin-only {
+    /* Hide admin-only elements for non-admin users */
     display: none !important;
 }
 
 @media (max-width: 600px) {
+    /* Responsive styles for small screens */
     .policies-header-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
     }
-    #delete-policy-confirmation {
-        position: fixed;
-        bottom: 50px !important;
-        width: calc(100vw - 80px) !important;
-        margin: 0 !important;
+    .policy-table td:first-child,
+    .policy-input-table td:first-child,
+    .policy-list-table td:first-child {
+        font-size: 0.92rem;
     }
+    .policy-table td:last-child,
+    .policy-input-table td:last-child,
+    .policy-list-table td:last-child {
+        font-size: 0.98rem;
+    }
+}
 
-    #update-policy-btn {
-        position: fixed;
-        bottom: 50px !important;
-        width: calc(100vw - 45px) !important;
-        margin: 0 !important;
-    }
+#policy-update,
+#policy-create,
+#policy-create-details,
+#policy-update #policy-inputs,
+#policy-update .policy-input-table,
+#policy-create-details .policy-input-table {
+    /* Layout for update/create policy forms */
+    width: 100%;
+    max-width: 500px;
+    min-width: 320px;
+    box-sizing: border-box;
+}
+
+#policy-update .policy-input-table,
+#policy_create-details .policy-input-table {
+    /* Fixed table layout for policy input tables */
+    table-layout: fixed;
+}
+
+#optionals-list,
+#create-optionals-list {
+    /* List of optional extras for policies */
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+/* Style for optional extras checkboxes in create/update popups */
+#optionals-list label.optional-extra-checkbox,
+#create-optionals-list label.optional-extra-checkbox {
+    display: inline-block;
+    margin-right: 12px;
+    margin-bottom: 6px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: 15px;
+    color: #333;
+    user-select: none;
+    line-height: 30px;
+    transition: background 0.2s, border-color 0.2s;
+}
+#optionals-list label.optional-extra-checkbox input[type="checkbox"],
+#create-optionals-list label.optional-extra-checkbox input[type="checkbox"] {
+    margin-right: 6px;
+}
+#optionals-list label.optional-extra-checkbox:has(input[disabled]),
+#create-optionals-list label.optional-extra-checkbox:has(input[disabled]) {
+    background: #f5f5f5;
+    cursor: not-allowed;
+    color: #aaa;
+    border-color: #e5e7eb;
 }

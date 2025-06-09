@@ -1,3 +1,9 @@
+// Dashboard main script for user and car insurance policy management
+// Handles user profile display, car insurance CRUD operations, and popup UI logic
+// Uses localStorage for session, and window.* API for backend communication
+// Populates templates for user and policy details, and manages optional extras
+// Hides admin-only features for non-admin users
+//
 document.addEventListener('DOMContentLoaded', async function () {
     const userData = localStorage.getItem('user')
     const user = userData ? JSON.parse(userData) : null;
@@ -255,7 +261,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     checkbox.name = 'optionals';
 
                     label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(' ' + extra.name));
+                    label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
                     // Add a tooltip for the checkbox
                     createOptionalsList.appendChild(label);
                 });
@@ -343,7 +349,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 });
 
-// define function to get car insurance by myself
+// Fetches all car insurance policies for the current user, with token refresh and session handling
 async function getCarInsuranceByMyself() {
     const accessToken = localStorage.getItem('access_token');
     const response = await fetch('/read_car_insurance_policy?mode=myself', {
@@ -373,7 +379,7 @@ async function getCarInsuranceByMyself() {
     }
 }
 
-// define function to populate user details
+// Populates the user profile section using a template and user data
 async function populateUserDetails(user) {
     const template = document.getElementById('user-profile-detail');
     const container = document.getElementById('user-profile');
@@ -396,6 +402,7 @@ async function populateUserDetails(user) {
 }
     
 
+// Populates the car insurance policy list using a template and data
 function populateCarInsuranceList(data) {
     console.log(data);
     // Get the template and container
@@ -424,7 +431,7 @@ function populateCarInsuranceList(data) {
     });
 }
 
-// define function to replace html in #policy-details with populated template #car-insurance-policy-detail
+// Populates the policy details section for a single policy using a template
 async function populateCarInsuranceDetails(policy) {
     const template = document.getElementById('car-insurance-policy-detail');
     const container = document.getElementById('policy-details');
@@ -448,6 +455,7 @@ async function populateCarInsuranceDetails(policy) {
     container.appendChild(clone);
 }
 
+// Populates the policy update form with current policy data
 async function populateCarInsuranceInputs(policy) {
     const template = document.getElementById('car-insurance-policy-inputs');
     const container = document.getElementById('policy-update');
@@ -483,7 +491,7 @@ async function populateCarInsuranceInputs(policy) {
     if (userIdInput) userIdInput.value = p.user_id || '';
 }
 
-// Helper to set values on the popup's visible inputs and render optional extras
+// Sets popup input values and renders optional extras for a policy
 async function setPopupInputValues(policy) {
     const p = policy.policy || {};
     const popup = document.getElementById('popup-body');
@@ -524,7 +532,7 @@ async function setPopupInputValues(policy) {
     window.populateOptionalExtras(policy, optionalsList);
 }
 
-// Update populateOptionalExtras to show price next to name
+// Renders optional extras as checkboxes, with price, and sets checked/disabled state
 window.populateOptionalExtras = async function(policy, optionalsList, disabled = false) {
     if (optionalsList) {
         optionalsList.innerHTML = 'Loading...';
@@ -541,19 +549,24 @@ window.populateOptionalExtras = async function(policy, optionalsList, disabled =
         allExtras.forEach(extra => {
             const label = document.createElement('label');
             label.className = 'optional-extra-checkbox';
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.value = extra.extra_id;
             checkbox.name = 'optionals';
             checkbox.checked = selectedExtras.includes(extra.extra_id);
             checkbox.disabled = disabled;
+
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
+            const text = document.createElement('span');
+            text.textContent = ` ${extra.name} (£${Number(extra.price).toFixed(2)})`;
+            label.appendChild(text);
             optionalsList.appendChild(label);
         });
     }
 };
 
+// Fills user template HTML with user data (username, email, role)
 function fillUserTemplate(templateHtml, user) {
     role = user.is_admin ? 'Admin' : 'User';
     return templateHtml
@@ -562,11 +575,15 @@ function fillUserTemplate(templateHtml, user) {
         .replace(/\[role\]/g, role || '');
 }
 
+// Fills policy template HTML with policy data and formatted optional extras
 function fillPolicyTemplate(templateHtml, policy) {
-    // Format optional_extras as a comma-delimited string of names if it's an array of objects
+    // Format optional_extras as a comma-delimited string of names and prices if it's an array of objects
     let optionals = '';
     if (Array.isArray(policy.optional_extras)) {
-        optionals = policy.optional_extras.map(e => e.name || '').filter(Boolean).join('<br/>');
+        optionals = policy.optional_extras
+            .map(e => e.name ? `${e.name} (£${Number(e.price).toFixed(2)})` : '')
+            .filter(Boolean)
+            .join('<br/>');
     } else if (typeof policy.optional_extras === 'string') {
         optionals = policy.optional_extras;
     }
@@ -595,6 +612,7 @@ function fillPolicyTemplate(templateHtml, policy) {
         .replace(/\[optionals\]/g, optionals);
 }
 
+// Fills policy input template HTML with policy data for editing
 function fillPolicyInputsTemplate(templateHtml, policy) {
     let end_date = policy.end_date || '';
     // Ensure date is formatted as dd/mm/yyyy
