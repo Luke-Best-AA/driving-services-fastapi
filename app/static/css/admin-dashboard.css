@@ -1,38 +1,51 @@
-#main-content {
+/*
+  Admin Dashboard Stylesheet
+  - Layout and appearance for admin dashboard sections, buttons, tables, and forms
+*/
+
+#main-header, #main-footer, #main-nav {
+    /* Main layout containers: full width, no border radius, no side padding */
     width: 100%;
-    margin: 20px 0;
     max-width: 100%;
-    position: static;
-    left: auto;
-    top: auto;
-    transform: none;
-    padding: 0;
-    box-sizing: border-box;
     border-radius: 0;
-    height: calc(100vh - 200px);
+    padding-left: 0;
+    padding-right: 0;
+    margin: 0;
+}
+
+#main-content {
+    /* Main content area: no margin, no border radius, hidden by default */
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    border-radius: 0;
     display: none;
-    overflow: hidden;
+    background-color: none;
+    box-shadow: none;
 }
 
 #admin-content {
+    /* Admin dashboard grid layout: 3 columns for picker, definer, output */
     display: grid;
     grid-template-columns: 1fr 1fr 2fr;
     grid-template-areas: "picker definer output";
-    height: 100%;
     gap: 10px;
     padding: 0 20px;
+    background-color: #f4f4f4;
 }
 
 .admin-section {
-    padding: 10px;    
+    /* Individual admin section styling: padding, border radius, background, shadow */
+    box-sizing: border-box;
+    padding: 15px;    
     border-radius: 8px;
     background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    overflow: scroll;
-    height: 100%;
+    background-color: white;
 }
 
 #action-picker {
+    /* Action picker area: grid layout for actions, equal row heights */
     grid-area: picker;
     display: grid;
     grid-template-rows: 1fr 1fr 1fr;
@@ -41,14 +54,18 @@
 }
 
 #action-definer {
+    /* Action definer area: occupies definer grid area */
     grid-area: definer;
 }
 
 #action-output {
+    /* Action output area: occupies output grid area, max width set */
     grid-area: output;
+    max-width: 50vw;
 }
 
 .admin-btn {
+    /* General styling for admin buttons: padding, border radius, font, cursor, transition */
     padding: 10px 20px;
     border-radius: 8px;
     font-size: 12px;
@@ -60,47 +77,57 @@
 }
 
 .admin-btn:hover {
+    /* Hover effects for admin buttons: lift and shadow */
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .admin-create-btn {
+    /* Specific styling for create button: gradient background, white text */
     background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
     color: #fff;
 }
 
 .admin-create-btn:hover {
+    /* Hover effect for create button: reverse gradient */
     background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 100%);
 }
 
 .admin-read-btn {
+    /* Specific styling for read button: gradient background, dark text */
     background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
     color: #2b2323;
 }
 
 .admin-read-btn:hover {
+    /* Hover effect for read button: reverse gradient */
     background: linear-gradient(90deg, #4ade80 0%, #22c55e 100%);
 }
 
 .admin-update-btn {
+    /* Specific styling for update button: gradient background, dark text */
     background: linear-gradient(90deg, #eab308 0%, #fbbf24 100%);
     color: #2b2323;
 }
 
 .admin-update-btn:hover {
+    /* Hover effect for update button: reverse gradient */
     background: linear-gradient(90deg, #fbbf24 0%, #eab308 100%);
 }
 
 .admin-delete-btn {
+    /* Specific styling for delete button: gradient background, white text */
     background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
     color: #fff;
 }
 
 .admin-delete-btn:hover {
+    /* Hover effect for delete button: reverse gradient */
     background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
 }
 
 .active-btn {
+    /* Active button styling: highlighted background, border, shadow */
     background: #fffbe6;
     color: #d97706;
     border: 2px solid #f59e42;
@@ -112,6 +139,7 @@
 }
 
 .active-btn:hover {
+    /* Hover effect for active button: maintain styles, no transform */
     background: #fffbe6;
     color: #d97706;
     border: 2px solid #f59e42;
@@ -121,6 +149,7 @@
 }
 
 .definer-input {
+    /* Definer input container: padding, background, border radius, shadow, flex layout */
     margin-top: 18px;
     padding: 14px 18px;
     background: #f3f4f6;
@@ -136,27 +165,32 @@
 
 /* Output card styling */
 #create-user-details-card {
+    /* User details card: full width, max width 400px */
     width: 100%;
     max-width: 400px;
 }
 
 #read-user-details-card {
+    /* Read user details card: full width, max width 400px */
     width: 100%;
     max-width: 400px;
 }
 
 #update-user-details-card {
+    /* Update user details card: full width, max width 400px */
     width: 100%;
     max-width: 400px;
 }
 
 #delete-user-details-card,
 #delete-policy-details-card {
+    /* Delete details cards: 90% width, max width 500px */
     width: 90%;
     max-width: 500px;
 }
 
 .output-card {
+    /* General output card styling: background, border radius, shadow, padding, margin */
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -166,6 +200,7 @@
 }
 
 .output-card header h2 {
+    /* Output card header: font size, weight, color, margin */
     font-size: 1.3rem;
     font-weight: 600;
     color: #2563eb;
@@ -173,11 +208,11 @@
 }
 
 .output-details {
+    /* Output details section: flex column, gap, margin, scrollable tables */
     display: flex;
     flex-direction: column;
     gap: 14px;
     margin-bottom: 10px;
-    /* Add for scrollable tables */
     max-width: 100%;
     overflow-x: auto;
     overflow-y: visible;
@@ -198,6 +233,7 @@
 .definer-input input[type="email"],
 .definer-input input[type="password"],
 .definer-input select {
+    /* Input fields in definer: border radius, border, font size, background, transition, padding */
     border-radius: 6px;
     border: 1px solid #d1d5db;
     font-size: 14px;
@@ -208,12 +244,14 @@
 }
 
 .definer-input input[type="number"] {
+    /* Specific margin for number inputs */
     margin-bottom: 6px;
 }
 
 .definer-input input[type="text"],
 .definer-input input[type="email"],
 .definer-input input[type="password"] {
+    /* Text, email, password inputs: full width, box sizing, transition, text color */
     width: 100%;
     box-sizing: border-box;
     transition: border 0.2s, background 0.2s;
@@ -221,17 +259,20 @@
 }
 
 .definer-input select {
+    /* Select inputs: full width, margin bottom */
     width: 100%;
     margin-bottom: 5px;
 }
 
 .definer-input input[type="number"]:focus {
+    /* Focus state for number inputs: thicker border, light blue background */
     border: 1.5px solid #3b82f6;
     background: #f0f9ff;
 }
 
 .input-label,
 .definer-input label {
+    /* Labels for inputs: font size, weight, color, margin, text alignment */
     font-size: 14px;
     font-weight: 500;
     color: #374151;
@@ -241,24 +282,28 @@
 }
 
 .output-submit-btn {
+    /* Submit button in output section: full width, margin */
     width: 100%;
     margin-top: 10px;
     margin-bottom: 0;
 }
 
 .error-msg {
+    /* Error message styling: red color, font size, margin */
     color: #ef4444;
     font-size: 13px;
     margin-top: 8px;
 }
 
 .success-msg {
+    /* Success message styling: green color, font size, margin */
     color: #22c55e;
     font-size: 13px;
     margin-top: 8px;
 }
 
 .definer-confirm-input {
+    /* Confirm input section: grid layout for label, input, button */
     display: grid;
     grid-template-columns: auto 1fr auto;
     grid-template-areas: "label input button";
@@ -267,6 +312,7 @@
 }
 
 .definer-confirm-input label {
+    /* Label in confirm input: grid area, margin, nowrap */
     grid-area: label;
     margin-bottom: 0;
     margin-right: 8px;
@@ -274,12 +320,14 @@
 }
 
 .definer-confirm-input input[type="number"] {
+    /* Number input in confirm input: grid area, width, box sizing */
     grid-area: input;
     width: 50%;
     box-sizing: border-box;
 }
 
 .definer-confirm-input .definer-confirm-btn {
+    /* Confirm button in confirm input: grid area, alignment, padding, font size, margin */
     grid-area: button;
     justify-self: end;
     min-width: 40px;
@@ -290,6 +338,7 @@
 }
 
 .list-table {
+    /* General table styling: full width, border collapse, background, border radius, font size, margin, shadow */
     width: 100%;
     border-collapse: collapse;
     background: #f8fafc;
@@ -300,17 +349,20 @@
 }
 
 .list-table thead {
+    /* Table header: gradient background, white text */
     background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
     color: #fff;
 }
 
 .list-table th, .list-table td {
+    /* Table cells: padding, text alignment, min width */
     padding: 12px 16px;
     text-align: left;
     min-width: 100px;
 }
 
 .list-table th {
+    /* Table header cells: font weight, letter spacing, border */
     font-weight: 600;
     letter-spacing: 0.03em;
     border-bottom: 2px solid #e5e7eb;
@@ -318,37 +370,42 @@
 }
 
 .list-table tbody tr {
+    /* Table body rows: background, transition */
     background: #fff;
     transition: background 0.2s;
 }
 
 .list-table tbody tr:nth-child(even) {
+    /* Zebra striping for even rows */
     background: #f3f4f6;
 }
 
 .list-table tbody tr:hover {
+    /* Hover effect for rows: light blue background */
     background: #e0e7ff;
 }
 
 .list-table td {
+    /* Table data cells: bottom border, font size */
     border-bottom: 1px solid #e5e7eb;
     font-size: 14px;
 }
 
 .list-table tr:last-child td {
+    /* Remove bottom border for last row */
     border-bottom: none;
 }
 
 .sortable-table th {
+    /* Sortable table header: relative positioning, user select, transition, padding for sort arrow */
     position: relative;
     user-select: none;
     transition: background 0.2s;
-    /* Reserve space for the sort arrow */
     padding-right: 1.5em;
 }
 
 .sortable-table th::after {
-    /* Reserve space for the arrow even when not sorted */
+    /* Space for sort arrow: reserved even when not sorted */
     content: "";
     width: 1em;
     height: 1em;
@@ -357,6 +414,7 @@
 }
 
 .sortable-table th.sort-asc::after {
+    /* Ascending sort arrow: content, size, color */
     content: " ▲";
     font-size: 0.9em;
     color: #2563eb;
@@ -364,6 +422,7 @@
 }
 
 .sortable-table th.sort-desc::after {
+    /* Descending sort arrow: content, size, color */
     content: " ▼";
     font-size: 0.9em;
     color: #2563eb;
@@ -371,16 +430,19 @@
 }
 
 .table-sort-desc {
+    /* Descending sort table: font size, color */
     font-size: 14px;
     color: #374151;
 }
 
 .filter-btn {
+    /* Filter button: margin, full width */
     margin-top: 10px;
     width: 100%;
 }
 
 .delete-table {
+    /* Delete confirmation table: full width, border collapse, background, border radius, margin, shadow */
     width: 100%;
     border-collapse: collapse;
     background: #fff8f8;
@@ -391,6 +453,7 @@
 }
 
 .delete-table td {
+    /* Cells in delete table: padding, border bottom, text color, font weight */
     padding: 10px 14px;
     border-bottom: 1px solid #f3f4f6;
     color: #991b1b;
@@ -398,16 +461,19 @@
 }
 
 .delete-table tr:last-child td {
+    /* Remove bottom border for last row in delete table */
     border-bottom: none;
 }
 
 #delete-user-details,
 #delete-policy-details {
+    /* Margin bottom for delete details sections */
     margin-bottom: 18px;
 }
 
 #delete-user-details p,
 #delete-policy-details p {
+    /* Paragraphs in delete details sections: text color, font weight, margin, font size */
     color: #991b1b;
     font-weight: 600;
     margin: 12px 0 18px 0;
@@ -415,6 +481,7 @@
 }
 
 #delete-user-form {
+    /* Delete user form: flex column, gap, alignment */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -422,6 +489,7 @@
 }
 
 #delete-user-submit-btn {
+    /* Delete user submit button: gradient background, white text, border radius, font weight, padding, font size, margin, transition, shadow */
     background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
     color: #fff;
     border-radius: 8px;
@@ -434,16 +502,19 @@
 }
 
 #delete-user-submit-btn:hover {
+    /* Hover effect for delete user submit button: reverse gradient, increased shadow */
     background: linear-gradient(90deg, #f87171 0%, #ef4444 100%);
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.13);
 }
 
 #create-policy-details-card {
+    /* Policy details card: full width, max width 500px */
     width: 100%;
     max-width: 500px;
 }
 
 .output-form {
+    /* Output form styling: flex column, gap, background, border radius, padding, shadow */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -454,6 +525,7 @@
 }
 
 .output-form label.input-label {
+    /* Labels in output form: font size, weight, color, margin, text alignment */
     font-size: 14px;
     font-weight: 500;
     color: #2563eb;
@@ -464,6 +536,7 @@
 
 .output-form input[type="text"],
 .output-form input[type="date"] {
+    /* Text and date inputs in output form: border radius, border, font size, background, transition, padding, margin, width, box sizing, font family */
     border-radius: 6px;
     border: 1px solid #d1d5db;
     font-size: 14px;
@@ -479,11 +552,13 @@
 
 .output-form input[type="text"]:focus,
 .output-form input[type="date"]:focus {
+    /* Focus state for text and date inputs: thicker border, light blue background */
     border: 1.5px solid #3b82f6;
     background: #f0f9ff;
 }
 
 .output-form .optionals-list {
+    /* Optional fields list in output form: grid layout, gap, margin */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 8px;
@@ -491,16 +566,19 @@
 }
 
 #read-policy-details-card {
+    /* Read policy details card: full width, max width 500px */
     width: 100%;
     max-width: 500px;
 }
 
 #update-policy-details-card {
+    /* Update policy details card: full width, max width 500px */
     width: 100%;
     max-width: 500px;
 }
 
 #delete-policy-details-card .optionals-list {
+    /* Optional fields list in delete policy details card: grid layout, gap, margin */
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
@@ -508,31 +586,37 @@
 }
 
 #create-extra-details-card {
+    /* Extra details card: full width, max width 500px */
     width: 100%;
     max-width: 500px;
 }
 
 #read-extra-details-card {
+    /* Read extra details card: full width, max width 400px */
     width: 100%;
     max-width: 400px;
 }
 
 #update-extra-details-card {
+    /* Update extra details card: full width, max width 500px */
     width: 100%;
     max-width: 500px;
 }
 
 #delete-extra-details-card {
+    /* Delete extra details card: full width, max width 400px */
     width: 100%;
     max-width: 400px;
 }
 
 #update-user-pwd-details-card {
+    /* Update user password details card: full width, max width 400px */
     width: 100%;
     max-width: 400px;
 }
 
 .optional-extra-checkbox {
+    /* Optional extra checkbox: min width, nowrap, flex */
     min-width: 180px;
     white-space: nowrap;
     flex: 1 1 180px;
@@ -540,6 +624,7 @@
 
 #update-policy-details-card .optional-extra-checkbox,
 #create-policy-details-card .optional-extra-checkbox {
+    /* Optional extra checkbox in policy details cards: min width 0, nowrap, overflow, text overflow */
     min-width: 0;
     white-space: nowrap;
     overflow: hidden;

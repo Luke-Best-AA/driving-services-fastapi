@@ -1,3 +1,8 @@
+// Login and registration page script
+// Handles login form submission, registration popup, and popup UI logic
+// Uses localStorage for session tokens and user info
+// Provides helper functions for showing popups and handling registration
+//
 const errorElement = document.getElementById('form-login-error-msg');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
@@ -10,12 +15,13 @@ const popupClose = document.getElementById('popup-close');
 const popupTitle = document.getElementById('popup-title');
 const popupBody = document.getElementById('popup-body');
 
-// on document load set focus to username input
+// On document load, set focus to username input and show body
 document.addEventListener('DOMContentLoaded', () => {
     document.body.style.display = 'block';
     usernameInput.focus();
 });
 
+// Login form submission: hashes password, sends to backend, handles response
 loginForm.addEventListener('submit', async function(event) {
     event.preventDefault();
 
@@ -56,14 +62,14 @@ loginForm.addEventListener('submit', async function(event) {
     }
 });
 
-// Helper to show popup
+// Helper to show popup with title and body
 function showPopup(title, bodyHtml) {
     popupTitle.textContent = title;
     popupBody.innerHTML = bodyHtml;
     window.openPopup();
 }
 
-// Show register popup when link clicked
+// Show register popup when link clicked, attach submit handler
 showRegisterLink.addEventListener('click', function(e) {
     e.preventDefault();
     const template = document.getElementById('register-form-template');
@@ -78,7 +84,7 @@ showRegisterLink.addEventListener('click', function(e) {
     regForm.addEventListener('submit', handleRegisterSubmit);
 });
 
-// Registration handler (no popup logic here)
+// Registration handler: validates, sends to backend, shows result in popup
 async function handleRegisterSubmit(event) {
     event.preventDefault();
     const form = event.target;

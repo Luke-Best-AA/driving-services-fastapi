@@ -1,3 +1,8 @@
+// Profile page script for viewing and updating user profile and password
+// Handles tab toggling, form population, and update logic for user info and password
+// Uses global window API for backend communication and session management
+// Provides helper functions for showing error/success messages
+//
 document.addEventListener('DOMContentLoaded', async function () {
     const userProfile = document.getElementById('user-profile');
     const userInputs = document.getElementById('user-inputs');
