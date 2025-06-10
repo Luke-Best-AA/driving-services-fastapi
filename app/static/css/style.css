@@ -661,11 +661,11 @@ input[type="checkbox"]:checked {
 
     #popup-container,
     #popup-content {
-        padding-top: max(60px, env(safe-area-inset-top, 0));
+        padding-top: max(100px, env(safe-area-inset-top, 0));
         box-sizing: border-box;
     }
     #popup-close {
-        top: max(55px, env(safe-area-inset-top, 0)) !important;
+        top: max(100px, env(safe-area-inset-top, 0)) !important;
     }
 
     #popup-container input[type="text"],
