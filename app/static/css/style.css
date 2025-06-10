@@ -658,4 +658,28 @@ input[type="checkbox"]:checked {
     #popup-title {
         font-size: 20px;
     }
+
+    #popup-container,
+    #popup-content {
+        padding-top: max(20px, env(safe-area-inset-top, 0));
+        box-sizing: border-box;
+    }
+    #popup-close {
+        top: max(15px, env(safe-area-inset-top, 0)) !important;
+    }
+
+    #popup-container input[type="text"],
+    #popup-container input[type="email"],
+    #popup-container input[type="password"],
+    #popup-container input[type="number"],
+    #popup-container input[type="date"],
+    #popup-container select {
+        width: 90%;
+        min-width: 0;
+        max-width: 320px;
+        /* margin-left: auto;
+        margin-right: auto; */
+        box-sizing: border-box;
+        display: block;
+    }
 }
