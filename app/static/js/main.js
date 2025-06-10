@@ -120,7 +120,6 @@
         }
         else {
             if (navBar) navBar.style.display = 'none';
-            registerLink.innerText = 'Register';
         }
     }
 
