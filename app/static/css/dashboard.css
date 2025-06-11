@@ -3,6 +3,10 @@
   - Styles for car insurance policy dashboard, forms, tables, and admin-only controls (delete)
 */
 
+#main-content {
+    min-height: calc(100vh - 270px) !important;
+}
+
 #car-insurance-policy,
 #car-insurance-policy-detail,
 #car-insurance-policy-inputs,
