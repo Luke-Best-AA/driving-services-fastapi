@@ -3,6 +3,10 @@
   - Styles for user profile card, input forms, update/cancel buttons, and pagination controls
 */
 
+#main-content {
+    min-height: calc(100vh - 270px) !important;
+}
+
 #user-section {
     /* Profile section border and spacing */
     border: 1.5px solid #2a5d9f;

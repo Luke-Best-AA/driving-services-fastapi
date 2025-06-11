@@ -3,11 +3,6 @@
   - Styles for main content, home header, login and register forms, responsive layout, and UI feedback
 */
 
-#main-content {
-    /* Prevent content overflow */
-    overflow: hidden;
-}
-
 #home-content {
     /* Grid layout for home page: header and login side by side */
     display: grid;
