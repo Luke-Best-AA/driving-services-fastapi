@@ -3,11 +3,6 @@
   - Styles for main content, home header, login and register forms, responsive layout, and UI feedback
 */
 
-#main-content {
-    /* Prevent content overflow */
-    overflow: hidden;
-}
-
 #home-content {
     /* Grid layout for home page: header and login side by side */
     display: grid;
@@ -199,9 +194,9 @@
 }
 #form-register input[type="text"],
 #form-register input[type="password"],
-#form-register button[type="submit"] {
-    /* Register form input/button width */
-    width: 220px;
+#form-register button[type="submit"],
+#form-register input[type="email"] {
+    width: 320px;
     box-sizing: border-box;
 }
 #form-register input[type="text"],
@@ -268,7 +263,7 @@
     margin: 8px 0 0 0;
     font-size: 1rem;
     color: #333;
-    width: 220px;
+    width: 320px;
     box-sizing: border-box;
     gap: 8px;
 }
