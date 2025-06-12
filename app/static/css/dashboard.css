@@ -253,6 +253,10 @@ body:not(.is-admin) .admin-only {
     .policy-list-table td:last-child {
         font-size: 0.98rem;
     }
+
+    #policy-inputs, #policy-create-details {
+        margin-bottom: 50px;
+    }
 }
 
 #policy-update,
