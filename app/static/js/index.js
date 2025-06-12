@@ -49,6 +49,8 @@ loginForm.addEventListener('submit', async function(event) {
         localStorage.setItem('access_token', access_token);
         localStorage.setItem('refresh_token', refresh_token);
         localStorage.setItem('user', JSON.stringify(user));
+        // Mark that user has logged in before
+        localStorage.setItem('has_logged_in_before', 'true');
         // Redirect to the home page
         window.location.href = '/dashboard';
     } else {
@@ -123,7 +125,7 @@ async function handleRegisterSubmit(event) {
         if (response.ok) {
             // Success: show success message using main.js popup logic
             if (window.showPopup) {
-                window.showPopup('Registration Successful', '<div class="register-success-msg">Registration successful! Please log in.</div>');
+                window.showPopup('Registration Successful', '<div class="register-success-msg">Registration successful! Please <a href="/">log in</a>.</div>');
                 setTimeout(() => window.hidePopup && window.hidePopup(), 2000);
             }
         } else {
