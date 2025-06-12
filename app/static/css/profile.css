@@ -12,6 +12,7 @@
     border: 1.5px solid #2a5d9f;
     margin-top: -1.5px;
     padding: 25px;
+    border-radius: 0 0 12px 12px;
 }
 
 #pagination-section {
@@ -176,11 +177,17 @@
 
 @media (max-width: 600px) {
     /* Responsive styles for small screens */
+    #user-section, #pagination-section {
+        margin-left: 3vw;
+        margin-right: 3vw;
+    }
+
     #user-profile {
         padding: 1rem;
         max-width: 95vw;
         font-size: 1rem;
     }
+
     #user-profile h3 {
         font-size: 1.3rem;
     }
