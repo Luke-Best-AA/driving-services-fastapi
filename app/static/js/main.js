@@ -493,7 +493,17 @@ function extractApiErrorMessage(error) {
 function showSessionExpiredPopup() {
     // Only show if not logging out
     if (window._isLoggingOut) return;
-    // Clear tokens and user info
+    // Only show if user has previously logged in
+    const hasLoggedInBefore = localStorage.getItem('has_logged_in_before');
+    if (!hasLoggedInBefore || hasLoggedInBefore !== 'true') {
+        // Just redirect to login page, do not show popup
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+        window.location.href = '/';
+        return;
+    }
+    // Clear tokens and user info, but keep has_logged_in_before
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
@@ -515,6 +525,8 @@ function showSessionExpiredPopup() {
             const okBtn = document.getElementById('session-expired-ok-btn');
             if (okBtn) {
                 okBtn.onclick = function() {
+                    // Clear the has_logged_in_before flag
+                    localStorage.removeItem('has_logged_in_before');
                     window.closePopup();
                     window.location.href = '/';
                 };

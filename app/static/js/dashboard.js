@@ -251,20 +251,22 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const allExtras = await window.fetchAllOptionalExtras();
 
                 createOptionalsList.innerHTML = '';
-                allExtras.forEach(extra => {
-                    const label = document.createElement('label');
-                    label.className = 'optional-extra-checkbox';
+                if (Array.isArray(allExtras) && allExtras.length > 0) {
+                    allExtras.forEach(extra => {
+                        const label = document.createElement('label');
+                        label.className = 'optional-extra-checkbox';
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = extra.extra_id;
-                    checkbox.name = 'optionals';
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = extra.extra_id;
+                        checkbox.name = 'optionals';
 
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
-                    // Add a tooltip for the checkbox
-                    createOptionalsList.appendChild(label);
-                });
+                        label.appendChild(checkbox);
+                        label.appendChild(document.createTextNode(` ${extra.name} (£${Number(extra.price).toFixed(2)})`));
+                        // Add a tooltip for the checkbox
+                        createOptionalsList.appendChild(label);
+                    });
+                }
             }           
 
             if (typeof openPopup === 'function') {
