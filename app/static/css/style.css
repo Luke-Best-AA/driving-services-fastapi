@@ -666,7 +666,7 @@ input[type="checkbox"]:checked {
         box-sizing: border-box;
     }
     #popup-close {
-        top: max(80px, env(safe-area-inset-top, 0));
+        top: 80px !important;
     }
 
     #popup-container input[type="text"],
