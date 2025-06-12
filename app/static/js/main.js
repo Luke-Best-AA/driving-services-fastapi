@@ -29,6 +29,12 @@
             void popupContainer.offsetWidth;
             popupContainer.classList.add('popup-open');
         }
+        // Always show the close button unless explicitly hidden (e.g., session expired)
+        const popupClose = document.getElementById('popup-close');
+        if (popupClose && popupClose.style.display === 'none') {
+            // Only show if not session expired popup (session expired popup will hide it again)
+            popupClose.style.display = '';
+        }
     }
 
     function closePopup() {
