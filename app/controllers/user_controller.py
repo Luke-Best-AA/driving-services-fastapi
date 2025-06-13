@@ -142,7 +142,7 @@ async def update_user_password(
             if not service.verify_password(payload.existing_password, user.password):
                 raise ValueError(
                     APIResponse(
-                        status=HTTPStatus.UNAUTHORIZED,
+                        status=HTTPStatus.BAD_REQUEST,
                         message=Messages.USER_INVALID_CREDENTIALS,
                         data=None
                     )

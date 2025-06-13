@@ -175,6 +175,10 @@
     transform: scale(1.02);
 }
 
+#password-error-msg, #password-success-msg {
+    margin-top: 15px;
+}
+
 @media (max-width: 600px) {
     /* Responsive styles for small screens */
     #user-section, #pagination-section {
