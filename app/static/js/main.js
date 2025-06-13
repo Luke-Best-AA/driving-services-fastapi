@@ -440,10 +440,17 @@ async function updateUserPassword(userId, existingPassword, newPassword) {
                 return await updateUserPassword(userId, existingPassword, newPassword);
             }
         }
-        console.error('Error updating password:', response.statusText);
+        // Return error for UI to handle
+        return { success: false, status: 401, message: 'Session expired' };
     } else {
-        const errorData = await response.json();
-        console.error('Error updating password:', errorData);
+        let errorData;
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            errorData = { message: 'Unknown error' };
+        }
+        // Return error for UI to handle
+        return { success: false, status: response.status, ...errorData };
     }
 }
 

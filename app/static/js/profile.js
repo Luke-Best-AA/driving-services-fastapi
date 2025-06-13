@@ -90,18 +90,51 @@ document.addEventListener('DOMContentLoaded', async function () {
             const newPassword = md5(document.getElementById('new-password').value);
             const confirmPassword = md5(document.getElementById('confirm-password').value);
 
+            // Use password form error/success divs
+            function showPasswordError(msg) {
+                // If error message contains both 'username' and 'password', show a friendlier message
+                if (msg && msg.toLowerCase().includes('username') && msg.toLowerCase().includes('password')) {
+                    msg = 'Invalid current password.';
+                }
+                let errorDiv = document.getElementById('password-error-msg');
+                if (errorDiv) {
+                    errorDiv.textContent = msg;
+                    errorDiv.style.display = 'block';
+                }
+                let successDiv = document.getElementById('password-success-msg');
+                if (successDiv) successDiv.style.display = 'none';
+            }
+            function showPasswordSuccess(msg) {
+                let successDiv = document.getElementById('password-success-msg');
+                if (successDiv) {
+                    successDiv.textContent = msg;
+                    successDiv.style.display = 'block';
+                }
+                let errorDiv = document.getElementById('password-error-msg');
+                if (errorDiv) errorDiv.style.display = 'none';
+            }
+
             if (newPassword !== confirmPassword) {
-                alert('Passwords do not match.');
+                showPasswordError('Passwords do not match.');
                 return;
             }
 
             try {
-                await window.updateUserPassword(user.user_id, currentPassword, newPassword);
-                alert('Password updated successfully.');
-                // Optionally, refresh the page or update the UI
-                window.location.reload();
+                const result = await window.updateUserPassword(user.user_id, currentPassword, newPassword);
+                if (result && result.success === false) {
+                    showPasswordError(window.extractApiErrorMessage(result));
+                    return;
+                }
+                if (result && result.error && result.error.detail) {
+                    showPasswordError(window.extractApiErrorMessage(result.error));
+                    return;
+                }
+                showPasswordSuccess('Password updated successfully.');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } catch (err) {
-                alert('Failed to update password.');
+                showPasswordError(window.extractApiErrorMessage(err));
                 console.error(err);
             }
         });
