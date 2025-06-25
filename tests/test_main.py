@@ -658,7 +658,7 @@ def test_update_user_password_invalid_existing_password(admin_token, mocker, val
         json={"user_id": 1, "existing_password": "5f4dcc3b5aa765d61d8327deb882cf99", "new_password": "5f4dcc3b5aa765d61d8327deb882cf99"},
         headers={"Authorization": f"Bearer {admin_token}"}
     )
-    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json() == {"detail": Messages.USER_INVALID_CREDENTIALS}
 
 def test_update_user_password_no_change(admin_token, mocker, valid_admin_user):
@@ -778,7 +778,7 @@ def test_update_user_password_existing_password_check(admin_token, mocker, valid
         "new_password": "newpass123"
     }
     response = client.patch("/update_user_password", json=payload, headers={"Authorization": f"Bearer {admin_token}"})
-    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.status_code == HTTPStatus.BAD_REQUEST
     assert response.json()["detail"] == Messages.USER_INVALID_CREDENTIALS
 
 
