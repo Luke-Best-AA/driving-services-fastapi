@@ -4,11 +4,13 @@ from pydantic import BaseModel
 from http import HTTPStatus
 
 from app.models.user import User
+from app.models.car_insurance_policy import CarInsurancePolicy
 from app.utils.response import APIResponse
 from app.utils.debug import Debug
 from app.utils.messages import Messages
 from app.utils.db_connect import DBConnect
 from app.services.user_service import UserService
+from app.services.car_insurance_policy_service import CarInsurancePolicyService
 from app.utils.common import validate_required_fields, exception_handler, verify_token
 from app.utils.config import (
     SERVER, DATABASE, DB_USERNAME, DB_PASSWORD, TRUSTED_CONNECTION
@@ -173,7 +175,16 @@ async def delete_user(user_id: int, token_data: dict = Depends(verify_token)):
         service = UserService(cursor)
         requesting_user = await service.get_user_by_id(token_data["user_id"])
         service.check_admin(requesting_user)
-        validate_required_fields({"user_id": user_id})        
+        validate_required_fields({"user_id": user_id})
+
+        # Find and delete all policies and their extras owned by the user before deleting the user
+        first_policy = CarInsurancePolicy(0, "", "", "", "", "", "", "")
+        policy_service = CarInsurancePolicyService(cursor, requesting_user, first_policy)
+        policies = policy_service.get_car_insurance_policy_by_user_id(user_id)
+        for policy in policies:
+            policy_service.policy = policy
+            await policy_service.delete_car_insurance_policy()
+
         await service.delete_user(user_id)
     return JSONResponse(
         content={

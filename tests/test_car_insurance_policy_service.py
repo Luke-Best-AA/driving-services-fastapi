@@ -290,7 +290,7 @@ async def test_get_car_insurance_policy_by_user_id_success(mocker, mock_cursor, 
         "format_car_insurance_policies",
         return_value=["formatted_policy"]
     )
-    result = await service.get_car_insurance_policy_by_user_id(user.user_id)
+    result = service.get_car_insurance_policy_by_user_id(user.user_id)
     assert result == ["formatted_policy"]
 
 @pytest.mark.asyncio

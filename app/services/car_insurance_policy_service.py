@@ -283,7 +283,7 @@ class CarInsurancePolicyService:
             result = self.format_car_insurance_policies(result)
         return result
 
-    async def get_car_insurance_policy_by_user_id(self, user_id):
+    def get_car_insurance_policy_by_user_id(self, user_id):
         if not self.user.is_admin and user_id != self.user.user_id:
             raise ValueError(
                 APIResponse(

@@ -81,7 +81,7 @@ async def read_car_insurance_policy(
         elif mode == "by_id":
             policies = await service.get_car_insurance_policy_by_id(policy_id, format=True)
         elif mode == "myself":
-            policies = await service.get_car_insurance_policy_by_user_id(requesting_user.user_id)
+            policies = service.get_car_insurance_policy_by_user_id(requesting_user.user_id)
         elif mode == "filter":
             policies = await service.filter_car_insurance_policies(field, value)
         else:
