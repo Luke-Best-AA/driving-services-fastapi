@@ -21,6 +21,17 @@ A modern web application for managing driving-related services, in particluar ca
 
 - **Production API Docs:** [https://driving-services-fastapi.onrender.com/docs](https://driving-services-fastapi.onrender.com/docs)
 - The above link provides interactive Swagger UI for all available API endpoints.
+You can login with the flowing Username-Password combinations or register a new user
+admin1 - password123 - Admin
+member1 - pass123 - User
+member2 - pass123 – User
+bobsmith – passcode - User
+issy - BlueFish7 - Admin
+luke – password - Admin
+steve - MyPass123 - Admin
+newmember – password - User
+jessica - password123 - User
+daniel - CarLover12 - User
 
 ---
 
