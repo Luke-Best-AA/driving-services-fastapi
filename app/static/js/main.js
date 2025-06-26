@@ -530,10 +530,10 @@ function showSessionExpiredPopup() {
             popupBody.innerHTML = '<p>Your session has expired. Please log in again.</p>' +
                 '<button id="session-expired-ok-btn" class="login-again-btn">Login again</button>';
         }
+        window.openPopup();
         if (popupClose) {
             popupClose.style.display = 'none';
         }
-        window.openPopup();
         setTimeout(() => {
             const okBtn = document.getElementById('session-expired-ok-btn');
             if (okBtn) {
