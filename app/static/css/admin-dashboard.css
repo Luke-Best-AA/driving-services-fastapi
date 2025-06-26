@@ -187,7 +187,6 @@
 #delete-policy-details-card {
     /* Delete details cards: 90% width, max width 500px */
     width: 90%;
-    max-width: 500px;
 }
 
 .output-card {
